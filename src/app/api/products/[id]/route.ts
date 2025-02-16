@@ -4,17 +4,18 @@ import { currentUser } from "@/lib/auth";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await currentUser();
+    const id = (await params).id;
 
     if (!user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const product = await db.product.findUnique({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     if (!product) {
@@ -26,7 +27,7 @@ export async function DELETE(
     }
 
     await db.product.delete({
-      where: { id: params.id },
+      where: { id: id },
     });
 
     return NextResponse.json({ success: true });
