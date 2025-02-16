@@ -20,15 +20,26 @@ import {
   ProductFormData,
   ProductFormDefaults,
 } from "@/types/product";
-import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
+import {
+  Loader2,
+  ChevronRight,
+  ChevronLeft,
+  AlertCircle,
+  Save,
+  Send,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import PredictPriceTab from "./tabs/predict-price";
 
-const TABS = ["basic", "details", "delivery", "payment"] as const;
+const TABS = ["basic", "details", "delivery", "payment", "price"] as const;
 type TabType = (typeof TABS)[number];
 
 export function ProductForm() {
   const [activeTab, setActiveTab] = useState<TabType>("basic");
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
+  const [isListing, setIsListing] = useState(false);
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -61,19 +72,30 @@ export function ProductForm() {
     return commission;
   };
 
-  const onSubmit = async (data: z.infer<typeof productSchema>) => {
+  const onSubmit = async (
+    data: z.infer<typeof productSchema>,
+    isDraft: boolean = false
+  ) => {
     try {
       setError(undefined);
       setSuccess(undefined);
 
       const commission = calculateCommission(data);
+
+      // Format the data according to Prisma schema
       const formattedData = {
         ...data,
         commission,
-        status: "PENDING",
+        status: isDraft ? "DRAFT" : "PENDING",
         manufacturerDate: data.manufacturerDate.toISOString(),
         expiryDate: data.expiryDate.toISOString(),
         bestBefore: data.bestBefore?.toISOString(),
+        // Convert image objects to array of URLs if needed
+        images: Array.isArray(data.images) ? data.images : [],
+        // Ensure payment methods match the enum
+        paymentMethods: data.paymentMethods.map((method) =>
+          method.replace(/\s+/g, "_").toUpperCase()
+        ),
       };
 
       const response = await fetch("/api/products", {
@@ -84,13 +106,20 @@ export function ProductForm() {
         body: JSON.stringify(formattedData),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to create product");
+        throw new Error(responseData.error || "Failed to create product");
       }
 
-      setSuccess("Your product has been listed for review!");
-      toast.success("Product listed successfully");
+      setSuccess(
+        isDraft
+          ? "Product saved as draft!"
+          : "Your product has been listed for review!"
+      );
+      toast.success(
+        isDraft ? "Draft saved successfully" : "Product listed successfully"
+      );
       form.reset();
     } catch (error) {
       const message =
@@ -104,33 +133,98 @@ export function ProductForm() {
   const isFirstTab = currentTabIndex === 0;
   const isLastTab = currentTabIndex === TABS.length - 1;
 
-  const handleTabChange = (tab: TabType) => {
-    const tabFields = {
-      basic: ["title", "description", "category", "images"] as const,
-      details: [
-        "originalPrice",
-        "price",
-        "quantity",
-        "unit",
-        "condition",
-      ] as const,
-      delivery: ["pickupAddress", "isDeliveryAvailable"] as const,
-      payment: ["paymentMethods"] as const,
-    };
+  const tabFields = {
+    basic: ["title", "description", "category", "images"] as const,
+    details: [
+      "originalPrice",
+      "price",
+      "quantity",
+      "unit",
+      "condition",
+      "manufacturerDate",
+      "expiryDate",
+    ] as const,
+    delivery: ["pickupAddress", "isDeliveryAvailable"] as const,
+    payment: ["paymentMethods"] as const,
+    price: ["price", "discountedPrice"] as const,
+  };
 
+  const handleTabChange = async (tab: TabType) => {
     // Validate current tab fields before switching
-    form
-      .trigger([...tabFields[activeTab]] as Array<keyof ProductFormData>)
-      .then((isValid) => {
-        if (isValid) setActiveTab(tab);
-      });
+    const currentTabFields = tabFields[activeTab];
+    const isValid = await form.trigger(currentTabFields);
+
+    if (!isValid) {
+      toast.error("Please fill in all required fields in current tab");
+      return;
+    }
+
+    setActiveTab(tab);
+  };
+
+  const handleNext = async () => {
+    const currentTabFields = tabFields[activeTab];
+    const isValid = await form.trigger(currentTabFields);
+
+    if (!isValid) {
+      toast.error("Please fill in all required fields in current tab");
+      return;
+    }
+
+    const nextTab = TABS[currentTabIndex + 1];
+    setActiveTab(nextTab);
+  };
+
+  // Add this helper function to show tab errors
+  const getTabErrors = (tab: TabType) => {
+    const fields = tabFields[tab];
+    const errors = fields
+      .map(
+        (field) =>
+          form.formState.errors[field as keyof ProductFormData]?.message
+      )
+      .filter(Boolean);
+    return errors.length > 0 ? errors : null;
+  };
+
+  const handleSaveAsDraft = async () => {
+    try {
+      setIsDraftSaving(true);
+      // Don't validate all fields for drafts
+      const basicFieldsValid = await form.trigger(tabFields.basic);
+      if (!basicFieldsValid) {
+        toast.error(
+          "Please fill in the basic information before saving as draft"
+        );
+        return;
+      }
+
+      await onSubmit(form.getValues(), true);
+    } catch (error) {
+      toast.error("Failed to save draft");
+    } finally {
+      setIsDraftSaving(false);
+    }
+  };
+
+  const handleListProduct = async (data: ProductFormData) => {
+    try {
+      setIsListing(true);
+      await onSubmit(data, false);
+    } finally {
+      setIsListing(false);
+    }
   };
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(handleListProduct)}
+        className="space-y-8"
+      >
         {error && (
           <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
@@ -147,12 +241,25 @@ export function ProductForm() {
           onValueChange={(tab) => handleTabChange(tab as TabType)}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-4">
-            {TABS.map((tab) => (
-              <TabsTrigger key={tab} value={tab} className="capitalize">
-                {tab}
-              </TabsTrigger>
-            ))}
+          <TabsList className="grid w-full grid-cols-5">
+            {TABS.map((tab) => {
+              const tabErrors = getTabErrors(tab);
+              return (
+                <TabsTrigger
+                  key={tab}
+                  value={tab}
+                  className={cn(
+                    "capitalize relative",
+                    tabErrors && "text-destructive"
+                  )}
+                >
+                  {tab}
+                  {tabErrors && (
+                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full" />
+                  )}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
 
           <TabsContent value="basic">
@@ -170,38 +277,81 @@ export function ProductForm() {
           <TabsContent value="payment">
             <PaymentTab form={form} />
           </TabsContent>
+
+          <TabsContent value="price">
+            <PredictPriceTab form={form} />
+          </TabsContent>
         </Tabs>
 
+        {/* Show current tab errors */}
+        {getTabErrors(activeTab) && (
+          <Alert variant="destructive" className="mt-2">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <ul className="list-disc pl-4">
+                {getTabErrors(activeTab)?.map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="flex justify-between gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => handleTabChange(TABS[currentTabIndex - 1])}
-            disabled={isFirstTab}
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Previous
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleTabChange(TABS[currentTabIndex - 1])}
+              disabled={isFirstTab || isDraftSaving || isListing}
+            >
+              <ChevronLeft className="mr-2 h-4 w-4" />
+              Previous
+            </Button>
+
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleSaveAsDraft}
+              disabled={isDraftSaving || isListing}
+            >
+              {isDraftSaving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving Draft...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Draft
+                </>
+              )}
+            </Button>
+          </div>
 
           {isLastTab ? (
             <Button
               type="submit"
               className="flex-1"
-              disabled={form.formState.isSubmitting}
+              disabled={isDraftSaving || isListing}
             >
-              {form.formState.isSubmitting ? (
+              {isListing ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Listing...
+                  Publishing...
                 </>
               ) : (
-                "List Product"
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Publish Product
+                </>
               )}
             </Button>
           ) : (
             <Button
               type="button"
-              onClick={() => handleTabChange(TABS[currentTabIndex + 1])}
+              onClick={handleNext}
+              disabled={isDraftSaving || isListing}
               className="flex-1"
             >
               Next
@@ -209,6 +359,20 @@ export function ProductForm() {
             </Button>
           )}
         </div>
+
+        {/* Show processing indicator */}
+        {(isDraftSaving || isListing) && (
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm">
+            <div className="flex h-full items-center justify-center">
+              <div className="flex items-center gap-2 rounded-lg bg-background p-4 shadow-lg">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <p className="text-sm font-medium">
+                  {isDraftSaving ? "Saving draft..." : "Publishing product..."}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
     </FormProvider>
   );

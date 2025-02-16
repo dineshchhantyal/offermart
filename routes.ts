@@ -1,4 +1,4 @@
-/**_
+/**
  * An array of routes that are accessible to the public
  * These routes do not require authentication
  * @type {string[]}
@@ -17,6 +17,16 @@ export const authRoutes = [
   "/auth/reset",
   "/auth/new-password",
   "/dashboard",
+];
+
+/**
+ * Routes that require authentication
+ * @type {string[]}
+ */
+export const protectedRoutes = [
+  "/dashboard",
+  "/products/new",
+  "/products/drafts", // Add this route
 ];
 
 /**

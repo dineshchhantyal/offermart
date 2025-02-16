@@ -46,6 +46,9 @@ export const productSchema = z.object({
   paymentMethods: z
     .array(z.enum(["CASH", "BANK_TRANSFER", "MOBILE_PAYMENT", "CARD"]))
     .min(1, "Select at least one payment method"),
+  status: z
+    .enum(["DRAFT", "PENDING", "VERIFIED", "REJECTED"])
+    .default("PENDING"),
 });
 
 // Add type safety for payment methods
@@ -72,6 +75,7 @@ export const ProductFormDefaults: Partial<ProductFormData> = {
   isDeliveryAvailable: false,
   isDonation: false,
   paymentMethods: [],
+  status: "DRAFT",
 };
 
 export const TAB_FIELDS = {

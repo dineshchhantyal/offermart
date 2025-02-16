@@ -142,6 +142,8 @@ model Product {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   images         Image[]
+
+  @@index([sellerId])
 }
 
 enum ItemCondition {
@@ -153,21 +155,21 @@ enum ItemCondition {
 
 enum PaymentMethodType {
   CASH
+  CARD
   BANK_TRANSFER
   MOBILE_PAYMENT
-  CARD
 }
 
 model PaymentMethod {
   id       String           @id @default(cuid())
-  type     PaymentMethodType
+  type     PaymentMethodType @unique
   products Product[]
 }
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  products    Product[]
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
 }
 
 model Image {
@@ -178,6 +180,7 @@ model Image {
 }
 
 enum ProductStatus {
+  DRAFT
   PENDING
   VERIFIED
   REJECTED
