@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -20,15 +20,44 @@ import { DataTable } from "@/components/ui/data-table";
 import { MoreHorizontal, Pencil, Trash2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { ProductWithDetails } from "@/types/product";
 
 interface ProductListingsProps {
   userId: string;
 }
 
 export function ProductListings({ userId }: ProductListingsProps) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
   console.log("ProductListingsProps", userId);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [products, setProducts] = useState<ProductWithDetails[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/products/listings");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch products");
+      }
+
+      const data = await response.json();
+      console.log("data", data);
+      setProducts(data.data);
+    } catch (error) {
+      console.error("Failed to load products", error);
+      setError("Failed to load products");
+      toast.error("Failed to load products");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const columns = [
     {
       accessorKey: "title",
@@ -41,6 +70,8 @@ export function ProductListings({ userId }: ProductListingsProps) {
               src={product.images[0]?.url}
               alt={product.title}
               className="h-10 w-10 rounded-md object-cover"
+              width={40}
+              height={40}
             />
             <div>
               <p className="font-medium">{product.title}</p>
@@ -127,7 +158,8 @@ export function ProductListings({ userId }: ProductListingsProps) {
       }
 
       toast.success("Product deleted successfully");
-      router.refresh();
+      // Refresh the products list
+      fetchProducts();
     } catch (error) {
       console.error("Failed to delete product", error);
       toast.error("Failed to delete product");
@@ -137,22 +169,33 @@ export function ProductListings({ userId }: ProductListingsProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>My Listings</CardTitle>
-        <CardDescription>
-          Manage your product listings and track their status
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <DataTable
-          columns={columns}
-          data={[]}
-          loading={isLoading}
-          emptyStateMessage="No products listed yet"
-        />
-      </CardContent>
-    </Card>
+    <div className="container mx-auto p-4 justify-center">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>My Listings</CardTitle>
+            <CardDescription>
+              Manage your product listings and track their status
+            </CardDescription>
+          </div>
+          <Button onClick={() => router.push("/sell")}>Add New Product</Button>
+        </CardHeader>
+        <CardContent>
+          {error ? (
+            <div className="flex h-[400px] items-center justify-center text-destructive">
+              {error}
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={products}
+              loading={isLoading}
+              emptyStateMessage="No products listed yet"
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import PaymentMethodType from "prisma/client";
 
 import { toast } from "sonner";
 import { BasicInfoTab } from "./tabs/basic-info";
@@ -30,6 +29,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PredictPriceTab from "./tabs/predict-price";
+import { useRouter } from "next/navigation";
 
 const TABS = ["basic", "details", "delivery", "payment", "price"] as const;
 type TabType = (typeof TABS)[number];
@@ -40,6 +40,7 @@ export function ProductForm() {
   const [success, setSuccess] = useState<string | undefined>();
   const [isDraftSaving, setIsDraftSaving] = useState(false);
   const [isListing, setIsListing] = useState(false);
+  const router = useRouter();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -83,13 +84,13 @@ export function ProductForm() {
       const formattedData = {
         ...data,
         commission,
-        status: isDraft ? "DRAFT" : "PENDING",
+        status: isDraft ? "DRAFT" : "VERIFIED",
         manufacturerDate: data.manufacturerDate.toISOString(),
         expiryDate: data.expiryDate.toISOString(),
         bestBefore: data.bestBefore?.toISOString() || null,
         images: Array.isArray(data.images) ? data.images : [],
         // Format payment methods to match enum values
-        paymentMethods: data.paymentMethods as PaymentMethodType[],
+        paymentMethods: data.paymentMethods,
       };
 
       console.log("Creating product with data", formattedData);
@@ -117,6 +118,13 @@ export function ProductForm() {
         isDraft ? "Draft saved successfully" : "Product listed successfully"
       );
       form.reset();
+
+      // redirect to product page
+
+      if (!isDraft) {
+        // Redirect to product page
+        router.push(`/products/${responseData.data.id}`);
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Something went wrong";
