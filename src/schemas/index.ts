@@ -70,3 +70,10 @@ export const SettingsSchema = z
       path: ["password"],
     }
   );
+
+export const productSchema = z.object({
+  // ... other fields ...
+  paymentMethods: z
+    .array(z.enum(["CASH", "CARD", "BANK_TRANSFER", "MOBILE_PAYMENT"] as const))
+    .min(1, "At least one payment method is required"),
+});

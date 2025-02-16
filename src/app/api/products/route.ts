@@ -1,128 +1,144 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { verifyExpiryDate } from "@/lib/ai/verify-expiry";
-import { auth } from "../../../../auth";
+import { PaymentMethodType, ProductStatus } from "@prisma/client";
+import { currentUser } from "@/lib/auth";
 
 const dummyProducts = [
   {
-    id : "1",
-    title: "Product 1",
-
-    description:
-      "Enjoy an exclusive discount on Product 1 with high quality electronics.",
+    id: "1",
+    title: "Mega Deal: Product 1",
+    description: "Enjoy an exclusive discount on Product 1!",
     brand: "Brand A",
-    category: "Electronics",
-    images: [
-      "https://plus.unsplash.com/premium_photo-1666900440561-94dcb6865554?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.0.3"
-    ],
-    originalPrice: 120,
+    categoryId: "cat1",
     price: 100,
     discountedPrice: 80,
+    expiryDate: new Date().toISOString(),
+    size: "Medium",
+    isDonation: false,
+    commission: 0.1,
+    status: "AVAILABLE",
     quantity: 50,
     unit: "pieces",
-    size: "Medium",
-    condition: "NEW",
-    manufacturerDate: new Date("2023-01-01"),
-    expiryDate: new Date("2024-01-01"),
-    bestBefore: new Date("2023-12-01"),
     pickupAddress: "123 Market St, City A",
     isDeliveryAvailable: true,
     deliveryFee: 5,
-    deliveryNotes: "Leave at the front desk",
+    paymentMethods: ["Credit Card", "PayPal"],
+    condition: "NEW",
+    originalPrice: 120,
+    manufacturerDate: new Date().toISOString(),
+    bestBefore: new Date().toISOString(),
     allergenInfo: "None",
-    storageInfo: "Keep refrigerated",
-    isDonation: false,
-    paymentMethods: ["CARD"],
+    storageInfo: "Keep in a cool, dry place",
+    images: [
+      {
+        url: "https://plus.unsplash.com/premium_photo-1666900440561-94dcb6865554?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      },
+    ],
+    sellerId: "seller1",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
   {
-    id : "2",
-    title: "Product 2",
-    description:
-      "Grab the deal before it expires! Limited time offer on fashion items.",
+    id: "2",
+    title: "Hot Deal: Product 2",
+    description: "Grab the deal before it expires!",
     brand: "Brand B",
-    category: "Fashion",
-    images: [
-      "https://plus.unsplash.com/premium_photo-1666900440561-94dcb6865554?q=80&w=3027&auto=format&fit=crop"
-    ],
-    originalPrice: 250,
+    image: "https://via.placeholder.com/300x500",
+    categoryId: "cat2",
     price: 200,
     discountedPrice: 150,
-    quantity: 30,
-    unit: "pieces",
+    expiryDate: new Date().toISOString(),
     size: "Large",
-    condition: "LIKE_NEW",
-    manufacturerDate: new Date("2023-02-01"),
-    expiryDate: new Date("2024-02-01"),
-    bestBefore: new Date("2024-01-01"),
+    isDonation: false,
+    commission: 0.1,
+    status: "AVAILABLE",
+    quantity: 30,
+    unit: "kg",
     pickupAddress: "456 Commerce Ave, City B",
     isDeliveryAvailable: false,
     deliveryFee: 0,
-    deliveryNotes: "N/A",
+    paymentMethods: ["Cash", "Credit Card"],
+    condition: "USED",
+    originalPrice: 250,
+    manufacturerDate: new Date().toISOString(),
+    bestBefore: new Date().toISOString(),
     allergenInfo: "None",
-    storageInfo: "Store in a cool dry place",
-    isDonation: false,
-    paymentMethods: ["CASH", "CARD"],
+    storageInfo: "Store in a ventilated area",
+    images: [
+      {
+        url: "https://plus.unsplash.com/premium_photo-1666900440561-94dcb6865554?q=80&w=3027&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      },
+    ],
+    sellerId: "seller2",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+
   },
 ];
 
 export async function POST(req: Request) {
-  console.log(req);
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
-
+    const session = await currentUser();
     const body = await req.json();
-    const {
-      title,
-      description,
-      brand,
-      category,
-      price,
-      discountedPrice,
-      expiryDate,
-      images,
-      size,
-      isDonation,
-      commission,
-      unit,
-      pickupAddress,
-    } = body;
 
-    // Verify expiry date using AI
-    const isExpiryValid = await verifyExpiryDate(images[0], expiryDate);
-    if (!isExpiryValid) {
-      return new NextResponse("Invalid expiry date", { status: 400 });
+    if (!session?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Create product with proper connections
     const product = await db.product.create({
       data: {
-        title,
-        description,
-        brand,
-        categoryId: category,
-        price,
-        discountedPrice,
-        expiryDate,
-        size,
-        isDonation,
-        commission,
-        sellerId: session.user.id,
-        unit,
-        pickupAddress,
-        images: {
-          createMany: {
-            data: images.map((url: string) => ({ url })),
+        title: body.title,
+        description: body.description,
+        brand: body.brand,
+        category: {
+          connectOrCreate: {
+            where: { name: body.category },
+            create: { name: body.category },
           },
         },
+        seller: {
+          connect: {
+            id: session.id,
+          },
+        },
+        images: {
+          create: body.images.map((url: string) => ({
+            url,
+          })),
+        },
+        originalPrice: body.originalPrice,
+        price: body.price,
+        discountedPrice: body.discountedPrice,
+        quantity: body.quantity,
+        unit: body.unit,
+        condition: body.condition,
+        manufacturerDate: new Date(body.manufacturerDate),
+        expiryDate: new Date(body.expiryDate),
+        bestBefore: body.bestBefore ? new Date(body.bestBefore) : null,
+        pickupAddress: body.pickupAddress,
+        isDeliveryAvailable: body.isDeliveryAvailable,
+        isDonation: body.isDonation,
+        commission: body.commission,
+        status: body.status as ProductStatus,
+        // Correctly handle payment methods as enum array
+        paymentMethods: body.paymentMethods.map(
+          (method: string) => method.toUpperCase() as PaymentMethodType
+        ),
+      },
+      include: {
+        seller: true,
+        category: true,
+        images: true,
       },
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json({ data: product });
   } catch (error) {
-    console.error("[PRODUCTS_POST]", error);
-    return new NextResponse("Internal error", { status: 500 });
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+    console.error("[PRODUCTS_POST]", errorMessage);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 

@@ -81,6 +81,21 @@ export function BasicInfoTab({ form }: BasicInfoTabProps) {
             </FormItem>
           )}
         />
+
+        {/* put category */}
+        <FormField
+          control={form.control}
+          name="category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Category" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </CardContent>
     </Card>
   );

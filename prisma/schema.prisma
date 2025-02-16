@@ -135,13 +135,15 @@ model Product {
   isDonation      Boolean       @default(false)
   commission      Float         @default(0.1)
   status          ProductStatus @default(PENDING)
-  paymentMethods  PaymentMethod[]
+  paymentMethods  PaymentMethodType[]
 
   seller         User         @relation("SellerProducts", fields: [sellerId], references: [id])
   sellerId       String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   images         Image[]
+
+  @@index([sellerId])
 }
 
 enum ItemCondition {
@@ -153,21 +155,16 @@ enum ItemCondition {
 
 enum PaymentMethodType {
   CASH
+  CARD
   BANK_TRANSFER
   MOBILE_PAYMENT
-  CARD
 }
 
-model PaymentMethod {
-  id       String           @id @default(cuid())
-  type     PaymentMethodType
-  products Product[]
-}
 
 model Category {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  products    Product[]
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
 }
 
 model Image {
@@ -178,6 +175,7 @@ model Image {
 }
 
 enum ProductStatus {
+  DRAFT
   PENDING
   VERIFIED
   REJECTED

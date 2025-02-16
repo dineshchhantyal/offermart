@@ -1,11 +1,12 @@
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { UserRole } from "@prisma/client";
 
 import { db } from "@/lib/db";
 import { getUserById } from "@/data/user";
 import { getTwoFactorConfoirmationByUserId } from "@/data/two-factor-confirmation";
-import authConfig from "./auth.config";
 import { getAccountByUserId } from "@/data/account";
+import authConfig from "./auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   pages: {
@@ -51,9 +52,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.id = token.sub;
       }
 
-      // if (token.role && session.user) {
-      //   session.user.role = token.role;
-      // }
+      if (token.role && session.user) {
+        session.user.role = token.role as UserRole;
+      }
 
       // if (token.isTwoFactorEnabled && session.user) {
       //   session.user.isTwoFactorEnabled = token.isTwoFactorEnabled;
