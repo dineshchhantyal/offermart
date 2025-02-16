@@ -67,7 +67,7 @@ const ProductPage: React.FC = () => {
 
   return (
     <div className="product-page p-4 relative">
-      <h1 className="text-2xl font-bold mb-4">🔥 Today's Hot Deals</h1>
+      <h1 className="text-2xl font-bold mb-4">🔥 Today&apos;s Hot Deals</h1>
 
       {/* Search Bar */}
       <input
