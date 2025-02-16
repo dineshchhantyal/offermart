@@ -73,3 +73,12 @@ export const ProductFormDefaults: Partial<ProductFormData> = {
   isDonation: false,
   paymentMethods: [],
 };
+
+export const TAB_FIELDS = {
+  basic: ["title", "description", "category", "images"],
+  details: ["originalPrice", "price", "quantity", "unit", "condition"],
+  delivery: ["pickupAddress", "isDeliveryAvailable"],
+  payment: ["paymentMethods"],
+} as const;
+
+export type TabType = keyof typeof TAB_FIELDS;

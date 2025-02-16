@@ -1,4 +1,6 @@
 "use client";
+
+import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,17 +20,53 @@ import {
   ProductFormData,
   ProductFormDefaults,
 } from "@/types/product";
+import { Loader2, ChevronRight, ChevronLeft } from "lucide-react";
+
+const TABS = ["basic", "details", "delivery", "payment"] as const;
+type TabType = (typeof TABS)[number];
 
 export function ProductForm() {
-  const methods = useForm();
+  const [activeTab, setActiveTab] = useState<TabType>("basic");
+  const [error, setError] = useState<string | undefined>();
+  const [success, setSuccess] = useState<string | undefined>();
+
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
-    defaultValues: ProductFormDefaults,
+    defaultValues: {
+      ...ProductFormDefaults,
+      paymentMethods: [],
+      isDonation: false,
+    },
   });
+
+  const calculateCommission = (data: ProductFormData) => {
+    if (data.isDonation) return 0;
+
+    // Base commission is 10%
+    let commission = 0.1;
+
+    // Reduce commission for items close to expiry
+    const daysToExpiry = Math.ceil(
+      (data.expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+    );
+    if (daysToExpiry < 30) {
+      commission *= 0.5; // 50% reduction for items expiring within 30 days
+    }
+
+    // Additional reduction for bulk items
+    if (data.quantity > 10) {
+      commission *= 0.9; // 10% reduction for bulk items
+    }
+
+    return commission;
+  };
 
   const onSubmit = async (data: z.infer<typeof productSchema>) => {
     try {
-      const commission = data.isDonation ? 0 : 0.1;
+      setError(undefined);
+      setSuccess(undefined);
+
+      const commission = calculateCommission(data);
       const formattedData = {
         ...data,
         commission,
@@ -51,23 +89,70 @@ export function ProductForm() {
         throw new Error(error.message || "Failed to create product");
       }
 
-      toast("Your product has been listed for review.");
-
+      setSuccess("Your product has been listed for review!");
+      toast.success("Product listed successfully");
       form.reset();
     } catch (error) {
-      toast(error instanceof Error ? error.message : "Something went wrong");
+      const message =
+        error instanceof Error ? error.message : "Something went wrong";
+      setError(message);
+      toast.error(message);
     }
   };
 
+  const currentTabIndex = TABS.indexOf(activeTab);
+  const isFirstTab = currentTabIndex === 0;
+  const isLastTab = currentTabIndex === TABS.length - 1;
+
+  const handleTabChange = (tab: TabType) => {
+    const tabFields = {
+      basic: ["title", "description", "category", "images"] as const,
+      details: [
+        "originalPrice",
+        "price",
+        "quantity",
+        "unit",
+        "condition",
+      ] as const,
+      delivery: ["pickupAddress", "isDeliveryAvailable"] as const,
+      payment: ["paymentMethods"] as const,
+    };
+
+    // Validate current tab fields before switching
+    form
+      .trigger([...tabFields[activeTab]] as Array<keyof ProductFormData>)
+      .then((isValid) => {
+        if (isValid) setActiveTab(tab);
+      });
+  };
+
   return (
-    <FormProvider {...methods}>
+    <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <Tabs defaultValue="basic" className="w-full">
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {success && (
+          <Alert>
+            <AlertDescription className="text-green-600">
+              {success}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Tabs
+          value={activeTab}
+          onValueChange={(tab) => handleTabChange(tab as TabType)}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-            <TabsTrigger value="details">Details</TabsTrigger>
-            <TabsTrigger value="delivery">Delivery</TabsTrigger>
-            <TabsTrigger value="payment">Payment</TabsTrigger>
+            {TABS.map((tab) => (
+              <TabsTrigger key={tab} value={tab} className="capitalize">
+                {tab}
+              </TabsTrigger>
+            ))}
           </TabsList>
 
           <TabsContent value="basic">
@@ -87,23 +172,43 @@ export function ProductForm() {
           </TabsContent>
         </Tabs>
 
-        <Alert>
-          <AlertDescription>
-            All listed items will be verified by our team before being
-            published.
-            {form.watch("isDonation")
-              ? " No commission will be charged for donations."
-              : " A 10% commission will be applied to the sale price."}
-          </AlertDescription>
-        </Alert>
+        <div className="flex justify-between gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => handleTabChange(TABS[currentTabIndex - 1])}
+            disabled={isFirstTab}
+          >
+            <ChevronLeft className="mr-2 h-4 w-4" />
+            Previous
+          </Button>
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? "Listing..." : "List Product"}
-        </Button>
+          {isLastTab ? (
+            <Button
+              type="submit"
+              className="flex-1"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Listing...
+                </>
+              ) : (
+                "List Product"
+              )}
+            </Button>
+          ) : (
+            <Button
+              type="button"
+              onClick={() => handleTabChange(TABS[currentTabIndex + 1])}
+              className="flex-1"
+            >
+              Next
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </form>
     </FormProvider>
   );
