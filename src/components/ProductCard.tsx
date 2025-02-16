@@ -39,7 +39,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex flex-col space-y-1">
             <h3 className="text-lg font-semibold">
               <Link
-                href={`/product/${encodeURIComponent(product.id)}`}
+                href={`/products/${encodeURIComponent(product.id)}`}
                 className="hover:underline"
               >
                 {product.title}
