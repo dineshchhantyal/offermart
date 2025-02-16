@@ -10,12 +10,14 @@ import { ImageCarousel } from "@/components/ui/image-carousel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
 import { Clock, MapPin, Package, Tag, Truck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface ProductViewProps {
   product: ProductWithDetails;
 }
 
 export function ProductView({ product }: ProductViewProps) {
+  const router = useRouter();
   return (
     <div className="container mx-auto py-6">
       {/* Breadcrumb */}
@@ -68,13 +70,13 @@ export function ProductView({ product }: ProductViewProps) {
               </span>
               {product.discountedPrice && (
                 <span className="text-lg text-muted-foreground line-through">
-                  ${product.originalPrice.toFixed(2)}
+                  ${product.originalPrice?.toFixed(2)}
                 </span>
               )}
             </div>
             {product.discountedPrice && (
               <Badge variant="secondary">
-                Save ${(product.originalPrice - product.price).toFixed(2)}
+                Save ${((product.originalPrice ?? 0) - product.price).toFixed(2)}
               </Badge>
             )}
           </div>
@@ -131,7 +133,12 @@ export function ProductView({ product }: ProductViewProps) {
                   <p className="text-sm text-muted-foreground">Seller</p>
                 </div>
               </div>
-              <Button>View Profile</Button>
+
+              {product.sellerId && (
+              <Button
+              onClick={() => router.push(`/seller/${product?.sellerId}`)}
+              >View Profile</Button>
+              )}
             </CardContent>
           </Card>
 
@@ -154,7 +161,7 @@ export function ProductView({ product }: ProductViewProps) {
               <div>
                 <p className="font-medium">Payment Methods</p>
                 <p className="text-muted-foreground">
-                  {product.paymentMethods.join(", ")}
+                  {product?.paymentMethods?.join(", ")}
                 </p>
               </div>
               <div>
@@ -172,7 +179,7 @@ export function ProductView({ product }: ProductViewProps) {
               <div>
                 <p className="font-medium">Manufactured</p>
                 <p className="text-muted-foreground">
-                  {format(new Date(product.manufacturerDate), "MMM d, yyyy")}
+                  {product.manufacturerDate ? format(new Date(product.manufacturerDate), "MMM d, yyyy") : "Not specified"}
                 </p>
               </div>
             </div>

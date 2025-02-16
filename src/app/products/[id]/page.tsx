@@ -5,8 +5,7 @@ import { Metadata } from "next";
 
 // Define the params type
 type Props = {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{ id: string }>;
 };
 
 async function getProduct(id: string) {
@@ -16,13 +15,7 @@ async function getProduct(id: string) {
       include: {
         category: true,
         images: true,
-        seller: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
-        },
+        seller: true,
       },
     });
 
@@ -34,7 +27,8 @@ async function getProduct(id: string) {
 }
 
 export default async function ProductPage({ params }: Props) {
-  const product = await getProduct(params.id);
+  const resolvedParams = await params;
+  const product = await getProduct(resolvedParams.id);
 
   if (!product) {
     notFound();
@@ -44,17 +38,20 @@ export default async function ProductPage({ params }: Props) {
 }
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await getProduct(params.id);
+export async function generateMetadata({ params }: Props): Promise<{id: string} & Metadata> {
+  const resolvedParams = await params;
+  const product = await getProduct(resolvedParams.id);
 
   if (!product) {
     return {
+      id: resolvedParams.id,
       title: "Product Not Found",
       description: "The product you are looking for does not exist.",
     };
   }
 
   return {
+    id: resolvedParams.id,
     title: product.title,
     description: product.description,
     openGraph: {

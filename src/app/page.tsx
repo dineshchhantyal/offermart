@@ -20,7 +20,7 @@ export default function Home() {
               Start Selling
             </Link>
             <Link
-              href="/buy"
+              href="/buy/new"
               className="px-8 py-3 border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-green-700 transition"
             >
               Browse Products

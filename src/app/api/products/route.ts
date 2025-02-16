@@ -73,6 +73,40 @@ const dummyProducts = [
     updatedAt: new Date().toISOString(),
   },
   {
+    id: "6",
+    title: "Organic Honey",
+    description: "Pure, unprocessed honey sourced from organic beehives.",
+    brand: "Nature's Best",
+    categoryId: "cat3",
+    price: 18,
+    discountedPrice: 15,
+    expiryDate: new Date("2025-11-30").toISOString(),
+    size: "500g",
+    isDonation: false,
+    commission: 0.1,
+    status: "AVAILABLE",
+    quantity: 120,
+    unit: "jars",
+    pickupAddress: "321 Honeycomb Rd, City F",
+    isDeliveryAvailable: true,
+    deliveryFee: 6,
+    paymentMethods: ["Credit Card", "PayPal"],
+    condition: "NEW",
+    originalPrice: 20,
+    manufacturerDate: new Date("2024-05-01").toISOString(),
+    bestBefore: new Date("2025-11-30").toISOString(),
+    allergenInfo: "May contain traces of pollen",
+    storageInfo: "Store in a cool, dry place",
+    images: [
+      {
+        url: "https://source.unsplash.com/random/300x300/?honey,bee",
+      },
+    ],
+    sellerId: "seller6",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
     id: "5",
     title: "Revitalizing Luxury Face Cream",
     description: "Premium face cream that nourishes and rejuvenates the skin.",
@@ -106,6 +140,40 @@ const dummyProducts = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
+  {
+    id: "7",
+    title: "Extra Strength Pain Relief Tablets",
+    description: "Fast-acting relief for headaches, muscle aches, and joint pain.",
+    brand: "ReliefPro",
+    categoryId: "cat4",
+    price: 12,
+    discountedPrice: 10,
+    expiryDate: new Date("2024-09-30").toISOString(),
+    size: "100 tablets per box",
+    isDonation: false,
+    commission: 0.1,
+    status: "AVAILABLE",
+    quantity: 150,
+    unit: "boxes",
+    pickupAddress: "456 Painfree St, City G",
+    isDeliveryAvailable: true,
+    deliveryFee: 5,
+    paymentMethods: ["Credit Card", "Cash"],
+    condition: "NEW",
+    originalPrice: 14,
+    manufacturerDate: new Date("2023-11-01").toISOString(),
+    bestBefore: new Date("2024-09-30").toISOString(),
+    allergenInfo: "None",
+    storageInfo: "Store in a cool, dry place",
+    images: [
+      {
+        url: "https://source.unsplash.com/random/300x300/?medicine,pills",
+      },
+    ],
+    sellerId: "seller7",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
 
 ];
 
@@ -178,7 +246,8 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
-  console.log(req);
-  return NextResponse.json(dummyProducts);
+export async function GET() {
+  return NextResponse.json({ data: dummyProducts });
 }
+
+

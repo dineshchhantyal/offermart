@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { Product, Category, Image } from "@prisma/client";
+import { Product, Category, Image, User } from "@prisma/client";
 
 export const productSchema = z.object({
   // Basic Info
@@ -98,4 +98,6 @@ export function productWithIdSchema(id: string) {
 export type ProductWithDetails = Product & {
   category: Category;
   images: Image[];
+  seller: User;
+  paymentMethods: PaymentMethod[];
 };
