@@ -3,26 +3,27 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Star } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 
 const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Local Bakery Owner",
-    image: "/testimonials/sarah.jpg",
+    image: "",
     quote:
       "OfferMart has helped us reduce waste by 40% while maintaining profitability. It's a game-changer for small businesses.",
   },
   {
     name: "Mike Chen",
     role: "Student",
-    image: "/testimonials/mike.jpg",
+    image: "",
     quote:
       "I save hundreds on groceries every month while helping the environment. The app is super easy to use!",
   },
   {
     name: "Emma Davis",
     role: "Sustainability Club President",
-    image: "/testimonials/emma.jpg",
+    image: "",
     quote:
       "OfferMart proves that sustainable business models can work. Their impact metrics are impressive.",
   },
@@ -56,12 +57,22 @@ export function TestimonialsSection() {
             >
               <div className="flex gap-4 items-center mb-4">
                 <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                  <Image
-                    src={testimonial.image}
-                    alt={testimonial.name}
-                    fill
-                    className="object-cover"
-                  />
+                  {testimonial.image ? (
+                    <Image
+                      src={testimonial.image}
+                      alt={testimonial.name}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  ) : (
+                    <Avatar className="object-cover w-full h-full">
+                      <AvatarImage
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                      />
+                      <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
+                    </Avatar>
+                  )}
                 </div>
                 <div>
                   <h3 className="font-semibold">{testimonial.name}</h3>
