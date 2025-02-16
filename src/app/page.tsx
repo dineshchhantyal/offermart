@@ -8,7 +8,7 @@ export default function Home() {
             <h1 className="text-4xl text-primary dark:text-white md:text-6xl font-bold mb-6">
               Save Money, Reduce Waste
             </h1>
-            <p className="text-xl mb-8 text-gray-100 text-gray-500 dark:text-gray-200">
+            <p className="text-xl mb-8  text-green-500 dark:text-gray-200">
               Join our community marketplace for near-expiry goods and make a
               difference.
             </p>
