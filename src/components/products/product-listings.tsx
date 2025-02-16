@@ -168,33 +168,33 @@ export function ProductListings({ userId }: ProductListingsProps) {
   };
 
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>My Listings</CardTitle>
-          <CardDescription>
-            Manage your product listings and track their status
-          </CardDescription>
-        </div>
-        <Button onClick={() => router.push("/sell/new")}>
-          Add New Product
-        </Button>
-      </CardHeader>
-      <CardContent>
-        {error ? (
-          <div className="flex h-[400px] items-center justify-center text-destructive">
-            {error}
+    <div className="container mx-auto p-4 justify-center">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>My Listings</CardTitle>
+            <CardDescription>
+              Manage your product listings and track their status
+            </CardDescription>
           </div>
-        ) : (
-          <DataTable
-            columns={columns}
-            data={products}
-            loading={isLoading}
-            emptyStateMessage="No products listed yet"
-          />
-        )}
-      </CardContent>
-    </Card>
+          <Button onClick={() => router.push("/sell")}>Add New Product</Button>
+        </CardHeader>
+        <CardContent>
+          {error ? (
+            <div className="flex h-[400px] items-center justify-center text-destructive">
+              {error}
+            </div>
+          ) : (
+            <DataTable
+              columns={columns}
+              data={products}
+              loading={isLoading}
+              emptyStateMessage="No products listed yet"
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
