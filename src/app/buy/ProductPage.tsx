@@ -18,7 +18,6 @@ const ProductPage: React.FC = () => {
   const [showFilterPanel, setShowFilterPanel] = useState<boolean>(false);
   const [expiryDateFilter, setExpiryDateFilter] = useState<string>("");
 
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -41,20 +40,30 @@ const ProductPage: React.FC = () => {
   // Filter logic
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
-      selectedCategories.length === 0 || selectedCategories.includes(product.category);
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(product.category);
     const matchesPrice = product.price <= maxPrice;
     const matchesDiscountedPrice =
-      product.discountedPrice !== undefined ? product.discountedPrice <= maxDiscountedPrice : true;
+      product.discountedPrice !== undefined
+        ? product.discountedPrice <= maxDiscountedPrice
+        : true;
     const matchesSearch = searchQuery
       ? product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase())
       : true;
     const matchesExpiryDate =
-      expiryDateFilter === "" || new Date(product.expiryDate) <= new Date(expiryDateFilter);
-  
-    return matchesCategory && matchesPrice && matchesDiscountedPrice && matchesSearch && matchesExpiryDate;
+      expiryDateFilter === "" ||
+      new Date(product.expiryDate) <= new Date(expiryDateFilter);
+
+    return (
+      matchesCategory &&
+      matchesPrice &&
+      matchesDiscountedPrice &&
+      matchesSearch &&
+      matchesExpiryDate
+    );
   });
-  
+
   // Handlers for filter side panel backdrop
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -67,7 +76,7 @@ const ProductPage: React.FC = () => {
 
   return (
     <div className="product-page p-4 relative">
-      <h1 className="text-2xl font-bold mb-4">🔥 Today's Hot Deals</h1>
+      <h1 className="text-2xl font-bold mb-4">🔥 Today&apos;s Hot Deals</h1>
 
       {/* Search Bar */}
       <input
@@ -149,9 +158,7 @@ const ProductPage: React.FC = () => {
 
             {/* Max Price Slider */}
             <div className="flex flex-col space-y-2 mb-4">
-              <label className="font-semibold">
-                Max Price: ${maxPrice}
-              </label>
+              <label className="font-semibold">Max Price: ${maxPrice}</label>
               <input
                 type="range"
                 min="10"
@@ -180,16 +187,15 @@ const ProductPage: React.FC = () => {
             </div>
 
             {/* Expiry Date Filter */}
-<div className="flex flex-col space-y-2 mb-4">
-  <label className="font-semibold">Expiry Date Before:</label>
-  <input
-    type="date"
-    value={expiryDateFilter}
-    onChange={(e) => setExpiryDateFilter(e.target.value)}
-    className="w-full border accent-green-600 bg-green-600 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"
-  />
-</div>
-
+            <div className="flex flex-col space-y-2 mb-4">
+              <label className="font-semibold">Expiry Date Before:</label>
+              <input
+                type="date"
+                value={expiryDateFilter}
+                onChange={(e) => setExpiryDateFilter(e.target.value)}
+                className="w-full border accent-green-600 bg-green-600 rounded p-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+              />
+            </div>
 
             {/* Additional filters can be added here */}
           </div>
