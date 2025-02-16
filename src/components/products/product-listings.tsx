@@ -50,6 +50,7 @@ export function ProductListings({ userId }: ProductListingsProps) {
       console.log("data", data);
       setProducts(data.data);
     } catch (error) {
+      console.error("Failed to load products", error);
       setError("Failed to load products");
       toast.error("Failed to load products");
     } finally {
