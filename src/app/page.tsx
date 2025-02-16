@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <div className="min-h-screen">
@@ -13,12 +15,18 @@ export default function Home() {
               difference.
             </p>
             <div className="flex gap-4 justify-center">
-              <button className="bg-green-700 text-white px-8 py-3 rounded-full hover:bg-green-800 transition">
+              <Link
+                href="/sell"
+                className="bg-green-700 text-white px-8 py-3 rounded-full hover:bg-green-800 transition"
+              >
                 Start Selling
-              </button>
-              <button className="border-2 border-green-700 text-green-700 dark:border-green-500 dark:text-green-500 px-8 py-3 rounded-full hover:bg-green-50 dark:hover:bg-green-900/30 transition">
+              </Link>
+              <Link
+                href="/browse"
+                className="border-2 border-green-700 text-green-700 dark:border-green-500 dark:text-green-500 px-8 py-3 rounded-full hover:bg-green-50 dark:hover:bg-green-900/30 transition"
+              >
                 Browse Products
-              </button>
+              </Link>
             </div>
           </div>
         </div>
