@@ -23,7 +23,9 @@ const productValidation = {
     pickupAddress: z.string(),
     isDeliveryAvailable: z.boolean().default(false),
     deliveryFee: z.number().optional(),
-    paymentMethods: z.array(z.string()),
+    paymentMethods: z.array(
+      z.enum(["CASH", "BANK_TRANSFER", "MOBILE_PAYMENT", "CARD"])
+    ),
     condition: z.enum(["NEW", "LIKE_NEW", "GOOD", "FAIR"]).default("NEW"),
     originalPrice: z.number().optional(),
     manufacturerDate: z.string().datetime().optional(),
@@ -72,19 +74,36 @@ export async function POST(req: Request) {
       // Create products first
       const createdProducts = await tx.product.createMany({
         data: validProducts.map((product) => ({
-          ...product,
-          sellerId: session.user.id as string,
+          title: product.title,
+          description: product.description,
+          brand: product.brand,
+          categoryId: product.categoryId,
+          price: product.price,
+          discountedPrice: product.discountedPrice,
+          originalPrice: product.originalPrice,
+          quantity: product.quantity,
+          unit: product.unit,
+          condition: product.condition,
           manufacturerDate: product.manufacturerDate
             ? new Date(product.manufacturerDate)
             : null,
           bestBefore: product.bestBefore ? new Date(product.bestBefore) : null,
           expiryDate: new Date(product.expiryDate),
+          pickupAddress: product.pickupAddress,
+          isDeliveryAvailable: product.isDeliveryAvailable,
+          deliveryFee: product.deliveryFee,
+          allergenInfo: product.allergenInfo,
+          storageInfo: product.storageInfo,
+          size: product.size,
+          isDonation: product.isDonation,
+          commission: product.isDonation ? 0 : product.commission,
+          sellerId: session.user.id as string,
           createdAt: new Date(),
           updatedAt: new Date(),
         })),
       });
 
-      // Get the created products to link images and payment methods
+      // Get the created products
       const productRecords = await tx.product.findMany({
         where: {
           sellerId: session.user.id,
@@ -95,7 +114,7 @@ export async function POST(req: Request) {
         take: validProducts.length,
       });
 
-      // Create images and payment method relationships
+      // Create relationships
       for (let i = 0; i < productRecords.length; i++) {
         const product = productRecords[i];
         const productData = validProducts[i];
@@ -108,14 +127,13 @@ export async function POST(req: Request) {
           })),
         });
 
-        // Create payment method relationships
-        await tx.paymentMethod.createMany({
-          data: productData.paymentMethods.map((methodId) => ({
-            id: methodId,
-            name: methodId, // Using methodId as name, adjust if you have a different naming convention
-          })),
-          skipDuplicates: true,
-        });
+        // Connect payment methods
+        await tx.$executeRaw`
+          INSERT INTO "_PaymentMethodToProduct" ("A", "B")
+          SELECT id, ${product.id}
+          FROM "PaymentMethod"
+          WHERE type = ANY(${productData.paymentMethods}::text[])
+        `;
       }
 
       return {

@@ -108,33 +108,40 @@ model Product {
   brand           String
   category        Category      @relation(fields: [categoryId], references: [id])
   categoryId      String
-  price           Float
   discountedPrice Float
+  price           Float
+  originalPrice   Float?
+  quantity        Int           @default(1)
+  unit            String        // e.g., pieces, kg, liters
+  condition       ItemCondition @default(NEW)
+
+  // Dates
+  manufacturerDate DateTime?
+  bestBefore      DateTime?
   expiryDate      DateTime
-  images          Image[]
+
+  // Location and Delivery
+  pickupAddress        String
+  isDeliveryAvailable  Boolean      @default(false)
+  deliveryFee         Float?
+  deliveryNotes       String?
+
+  // Product Details
+  allergenInfo    String?
+  storageInfo     String?
   size            String?
+
+  // Payment and Status
   isDonation      Boolean       @default(false)
   commission      Float         @default(0.1)
   status          ProductStatus @default(PENDING)
-
-  // New fields
-  quantity        Int          @default(1)
-  unit           String       // e.g., pieces, kg, liters
-  pickupAddress  String
-  isDeliveryAvailable Boolean @default(false)
-  deliveryFee    Float?
-  paymentMethods PaymentMethod[]
-  condition      ItemCondition @default(NEW)
-  originalPrice  Float?        // Optional original retail price
-  manufacturerDate DateTime?
-  bestBefore     DateTime?     // Different from expiry for some products
-  allergenInfo   String?      // For food items
-  storageInfo    String?      // Storage requirements
+  paymentMethods  PaymentMethod[]
 
   seller         User         @relation("SellerProducts", fields: [sellerId], references: [id])
   sellerId       String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  images         Image[]
 }
 
 enum ItemCondition {
@@ -144,9 +151,16 @@ enum ItemCondition {
   FAIR
 }
 
+enum PaymentMethodType {
+  CASH
+  BANK_TRANSFER
+  MOBILE_PAYMENT
+  CARD
+}
+
 model PaymentMethod {
-  id       String    @id @default(cuid())
-  name     String
+  id       String           @id @default(cuid())
+  type     PaymentMethodType
   products Product[]
 }
 
