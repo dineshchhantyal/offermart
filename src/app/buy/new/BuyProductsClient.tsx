@@ -3,6 +3,10 @@
 import React, { useState, useMemo } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductWithDetails } from "@/types/product";
+import { Input } from "@/components/ui/input";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Search } from "lucide-react";
 
 interface BuyProductsClientProps {
   products: ProductWithDetails[];
@@ -10,7 +14,9 @@ interface BuyProductsClientProps {
 
 const categories = ["All", "Electronics", "Fashion", "Home", "Toys"];
 
-export default function BuyProductsClient({ products }: BuyProductsClientProps) {
+export default function BuyProductsClient({
+  products,
+}: BuyProductsClientProps) {
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -18,45 +24,62 @@ export default function BuyProductsClient({ products }: BuyProductsClientProps) 
     return products.filter((product) => {
       const matchesCategory =
         categoryFilter === "All" || product.category.name === categoryFilter;
-      const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = product.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   }, [products, categoryFilter, searchQuery]);
 
   return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">Daily Movers</h1>
-      
-      {/* Filter Options */}
-      <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex flex-wrap gap-2">
+    <div className="container mx-auto px-4 py-6 space-y-6">
+      <div className="flex flex-col space-y-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-center">
+          Daily Movers
+        </h1>
+
+        {/* Search Bar */}
+        <div className="relative w-full max-w-sm mx-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 w-full"
+          />
+        </div>
+      </div>
+
+      {/* Categories ScrollArea */}
+      <ScrollArea className="w-full whitespace-nowrap">
+        <div className="flex space-x-2 pb-2">
           {categories.map((cat) => (
-            <button
+            <Button
               key={cat}
+              variant={categoryFilter === cat ? "default" : "outline"}
               onClick={() => setCategoryFilter(cat)}
-              className={`px-4 py-2 rounded transition-colors duration-200 ${
-                categoryFilter === cat ? "bg-blue-500 text-white" : "bg-gray-200 text-black"
-              }`}
+              className="min-w-[80px]"
+              size="sm"
             >
               {cat}
-            </button>
+            </Button>
           ))}
         </div>
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="border border-gray-300 p-2 rounded w-full sm:w-64"
-        />
-      </div>
-      
-      {/* Products Grid with proper grid sizes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {filteredProducts.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
-      </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+
+      {/* Products Grid */}
+      {filteredProducts.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">No products found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          {filteredProducts.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
