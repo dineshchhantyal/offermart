@@ -8,7 +8,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
           {/* Brand Section */}
           <div>
-            <h2 className="text-2xl font-bold text-green-600">RenewMart</h2>
+            <h2 className="text-2xl font-bold text-green-600">OfferMart</h2>
             <p className="mt-4 text-gray-600 dark:text-gray-300">
               Making sustainability accessible through smart shopping of
               near-expiry goods.
@@ -28,22 +28,6 @@ const Footer = () => {
                     className="text-gray-600 hover:text-green-600 dark:text-gray-300"
                   >
                     About
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/careers"
-                    className="text-gray-600 hover:text-green-600 dark:text-gray-300"
-                  >
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/blog"
-                    className="text-gray-600 hover:text-green-600 dark:text-gray-300"
-                  >
-                    Blog
                   </Link>
                 </li>
               </ul>
@@ -129,7 +113,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-12 border-t border-gray-200 pt-8 dark:border-gray-700">
           <p className="text-center text-sm text-gray-600 dark:text-gray-300">
-            © {new Date().getFullYear()} RenewMart. All rights reserved.
+            © {new Date().getFullYear()} OfferMart. All rights reserved.
           </p>
         </div>
       </div>

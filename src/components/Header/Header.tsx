@@ -30,9 +30,9 @@ export const Header = async ({ label }: HeaderProps) => {
           )}
           {user && (
             <>
-              <Link href="/dashboard">
+              <Link href="/sell">
                 <Button variant={"outline"} className="text-primary">
-                  Dashboard
+                  Sell
                 </Button>
               </Link>
               <UserButton />
