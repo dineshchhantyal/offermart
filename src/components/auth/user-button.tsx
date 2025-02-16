@@ -29,7 +29,7 @@ export const UserButton = async () => {
       <DropdownMenuContent className="w-40" align="end">
         <DropdownMenuItem>
           <FaSellsy className="h-4 w-4" />
-          <a href="/sell">Sell</a>
+          <a href="/sell">Sell New Item</a>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <ListChecks className="h-4 w-4" />

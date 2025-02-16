@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PredictPriceTab from "./tabs/predict-price";
+import { useRouter } from "next/navigation";
 
 const TABS = ["basic", "details", "delivery", "payment", "price"] as const;
 type TabType = (typeof TABS)[number];
@@ -39,6 +40,7 @@ export function ProductForm() {
   const [success, setSuccess] = useState<string | undefined>();
   const [isDraftSaving, setIsDraftSaving] = useState(false);
   const [isListing, setIsListing] = useState(false);
+  const router = useRouter();
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -116,6 +118,13 @@ export function ProductForm() {
         isDraft ? "Draft saved successfully" : "Product listed successfully"
       );
       form.reset();
+
+      // redirect to product page
+
+      if (!isDraft) {
+        // Redirect to product page
+        router.push(`/products/${responseData.data.id}`);
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Something went wrong";
