@@ -71,7 +71,7 @@ const ProductPage: React.FC = () => {
               <Button
                 variant="default"
                 onClick={() => setCategoryFilter(cat === "All" ? "" : cat)}
-                className={`px-4 py-2 rounded ${
+                className={`px-4 py-2 rounded hover:shadow-xl transition-shadow duration-300 ${
                   (cat === "All" && categoryFilter === "") ||
                   categoryFilter.toLowerCase() === cat.toLowerCase()
                     ? "text-white"

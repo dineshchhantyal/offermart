@@ -71,11 +71,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               Expires: {product.expiryDate.split("T")[0]}
             </p>
             <div className="flex space-x-1 items-baseline">
-              <span className="text-xl font-bold text-green-600">
-                ${product.discountedPrice}
-              </span>
+             
               <span className="text-sm line-through text-red-500">
                 ${product.price}
+              </span>
+              <span className="text-xl font-bold text-green-600">
+                ${product.discountedPrice}
               </span>
             </div>
           </div>
