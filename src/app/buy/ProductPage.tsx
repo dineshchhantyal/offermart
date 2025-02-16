@@ -104,39 +104,39 @@ const ProductPage: React.FC = () => {
 
       {/* Filter Side Panel */}
       {showFilterPanel && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-30 z-40" 
-          onClick={handleBackdropClick}
-        >
-          <div 
-            className="fixed top-0 right-0 w-80 h-full bg-white shadow-lg p-4 z-50" 
-            onClick={stopPropagation}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Filters</h2>
-              <Button variant="default" size="icon" onClick={() => setShowFilterPanel(false)}>
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            <div className="space-y-4">
-              {/* Expiry Date Filter */}
-              <div className="flex flex-col">
-                <label htmlFor="expiryFilter" className="mb-1 font-semibold text-gray-700">
-                  Expiry Date Before
-                </label>
-                <input
-                  id="expiryFilter"
-                  type="date"
-                  value={expiryFilter}
-                  onChange={(e) => setExpiryFilter(e.target.value)}
-                  className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              {/* Additional filters can be added here */}
-            </div>
-          </div>
+  <div 
+    className="fixed inset-0 bg-black bg-opacity-30 z-[1000]" 
+    onClick={handleBackdropClick}
+  >
+    <div 
+      className="fixed top-0 right-0 w-80 h-full bg-white shadow-lg p-4 z-[1010]" 
+      onClick={stopPropagation}
+    >
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">Filters</h2>
+        <Button variant="default" size="icon" onClick={() => setShowFilterPanel(false)}>
+          <X className="w-5 h-5" />
+        </Button>
+      </div>
+      <div className="space-y-4">
+        {/* Expiry Date Filter */}
+        <div className="flex flex-col">
+          <label htmlFor="expiryFilter" className="mb-1 font-semibold text-gray-700">
+            Expiry Date Before
+          </label>
+          <input
+            id="expiryFilter"
+            type="date"
+            value={expiryFilter}
+            onChange={(e) => setExpiryFilter(e.target.value)}
+            className="border rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-      )}
+        {/* Additional filters can be added here */}
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };
