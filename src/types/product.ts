@@ -2,6 +2,7 @@ import * as z from "zod";
 
 export const productSchema = z.object({
   // Basic Info
+
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   brand: z.string().min(2, "Brand must be at least 2 characters"),
@@ -73,3 +74,9 @@ export const ProductFormDefaults: Partial<ProductFormData> = {
   isDonation: false,
   paymentMethods: [],
 };
+
+export function productWithIdSchema(id: string) {
+  return productSchema.extend({
+    id: z.literal(id),
+  });
+}
