@@ -18,6 +18,15 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 const productSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
@@ -60,10 +69,7 @@ export function ProductForm() {
 
   const onSubmit = async (data: z.infer<typeof productSchema>) => {
     try {
-      // Calculate commission
       const commission = data.isDonation ? 0 : 0.1;
-
-      // Upload to server
       const response = await fetch("/api/products", {
         method: "POST",
         body: JSON.stringify({
@@ -72,13 +78,14 @@ export function ProductForm() {
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to create product");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create product");
+      }
 
-      // Show success message
+      toast("Your product has been listed for review.");
     } catch (error) {
-      // Show error message
-
-      console.error("ProductForm Error:", error);
+      toast(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
@@ -220,17 +227,166 @@ export function ProductForm() {
           </Card>
         </TabsContent>
 
-        {/* Continue with Delivery and Payment tabs... */}
+        <TabsContent value="delivery" className="space-y-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="pickupAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pickup Address</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          placeholder="Enter the pickup address for the product"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="isDeliveryAvailable"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Delivery Available</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {form.watch("isDeliveryAvailable") && (
+                  <FormField
+                    control={form.control}
+                    name="deliveryFee"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Delivery Fee</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value))
+                            }
+                            placeholder="Enter delivery fee"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="payment" className="space-y-4">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="paymentMethods"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Accepted Payment Methods</FormLabel>
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          "CASH",
+                          "BANK_TRANSFER",
+                          "MOBILE_PAYMENT",
+                          "CARD",
+                        ].map((method) => (
+                          <FormField
+                            key={method}
+                            control={form.control}
+                            name="paymentMethods"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                <FormControl>
+                                  <Checkbox
+                                    checked={field.value?.includes(method)}
+                                    onCheckedChange={(checked) => {
+                                      const currentValue = field.value || [];
+                                      if (checked) {
+                                        field.onChange([
+                                          ...currentValue,
+                                          method,
+                                        ]);
+                                      } else {
+                                        field.onChange(
+                                          currentValue.filter(
+                                            (value) => value !== method
+                                          )
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormLabel className="font-normal">
+                                  {method.replace("_", " ")}
+                                </FormLabel>
+                              </FormItem>
+                            )}
+                          />
+                        ))}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="isDonation"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Mark as Donation (No Commission)</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       <Alert>
         <AlertDescription>
           All listed items will be verified by our team before being published.
+          {form.watch("isDonation")
+            ? " No commission will be charged for donations."
+            : " A 10% commission will be applied to the sale price."}
         </AlertDescription>
       </Alert>
 
-      <Button type="submit" className="w-full">
-        List Product
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={form.formState.isSubmitting}
+      >
+        {form.formState.isSubmitting ? "Listing..." : "List Product"}
       </Button>
     </form>
   );
