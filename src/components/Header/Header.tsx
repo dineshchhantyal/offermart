@@ -13,7 +13,7 @@ export const Header = async ({ label }: HeaderProps) => {
   const user = await currentUser();
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50" aria-label={label}>
+    <header className="bg-white shadow-sm sticky top-0 z-40" aria-label={label}>
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <LogoLink showText={true} />
 

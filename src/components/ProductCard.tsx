@@ -1,89 +1,92 @@
-
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { HeartIcon, PlusIcon } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
-interface Product {
-
-    id: string;
-    title: string;
-    description: string;
-    brand: string;
-    image : string;
-    categoryId: string;
-    category: string;
-    price: number;
-    discountedPrice: number;
-    expiryDate: string;
-    size?: string;
-    isDonation: boolean;
-    commission: number;
-    status: string;
-    quantity: number;
-    unit: string;
-    pickupAddress: string;
-    isDeliveryAvailable: boolean;
-    deliveryFee?: number;
-    paymentMethods: string[];
-    condition: string;
-    originalPrice?: number;
-    manufacturerDate?: string;
-    bestBefore?: string;
-    allergenInfo?: string;
-    storageInfo?: string;
-    images: { url: string }[];
-    sellerId: string;
-    createdAt: string;
-    updatedAt: string;
-
+export interface Product {
+  id: string;
+  title: string;
+  description: string;
+  brand: string;
+  category: string;
+  images: string[];
+  originalPrice: number;
+  price: number;
+  discountedPrice: number;
+  quantity: number;
+  unit: string;
+  size?: string;
+  condition: "NEW" | "LIKE_NEW" | "GOOD" | "FAIR";
+  manufacturerDate: string; // ISO string
+  expiryDate: string;       // ISO string
+  bestBefore?: string | null; // ISO string or null
+  pickupAddress: string;
+  isDeliveryAvailable: boolean;
+  deliveryFee?: number;
+  deliveryNotes?: string;
+  allergenInfo?: string;
+  storageInfo?: string;
+  isDonation: boolean;
+  paymentMethods: ("CASH" | "BANK_TRANSFER" | "MOBILE_PAYMENT" | "CARD")[];
 }
 
-
 export interface ProductCardProps { 
-    product: Product;
-    }
+  product: Product;
+}
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-    return (
-        <Card className="w-[300px] group relative space-y-4 overflow-hidden">
-        <figure className="group-hover:opacity-90">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="bg-white/70 absolute top-3 end-3 rounded-full dark:text-black">
-            <HeartIcon className="size-4" />
-          </Button>
-          <Image
-            className="aspect-square w-full"
-            src={product.images[0].url}
-            width={300}
-            height={500}
-            alt={product.title}
-          />
-        </figure>
-        <CardContent className="px-4 py-0">
-          <div className="flex justify-between">
-            <div>
-              <h3 className="text-lg">
-                <Link href={product.title}>
-                  <span aria-hidden="true" className="absolute inset-0" />
-                  {product.title}
-                </Link>
-              </h3>
-              <p className="text-sm text-muted-foreground">{product.category}</p>
-            </div>
-            <p className="text-lg font-semibold line-through text-red-900">{product.price}</p>
-            <p className="text-lg font-semibold">{product.discountedPrice}</p>
+  return (
+    <Card className="w-[300px] group relative overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-shadow duration-300">
+      <figure className="relative">
+        <Image 
+          className="w-full h-56 object-cover"
+          src={product.images[0]}
+          width={300}
+          height={224}
+          alt={product.title}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 bg-white/80 rounded-full shadow-sm"
+        >
+          <HeartIcon className="w-5 h-5 text-red-500" />
+        </Button>
+      </figure>
+      <CardContent className="p-4">
+        <div className="flex justify-between">
+          {/* Left Column: Product & Brand */}
+          <div className="flex flex-col space-y-1">
+            <h3 className="text-lg font-semibold">
+              <Link href={`/product/${encodeURIComponent(product.title)}`} className="hover:underline">
+                {product.title}
+              </Link>
+            </h3>
+            <p className="text-sm text-gray-600">{product.brand}</p>
           </div>
-        </CardContent>
-        <CardFooter className="p-0 border-t">
-          <Button variant="ghost" className="w-full">
-            <PlusIcon className="size-4 me-1" /> Add to Card
-          </Button>
-        </CardFooter>
-      </Card>
-  
-    );
-  };    
+          {/* Right Column: Expiry & Price */}
+          <div className="flex flex-col items-end space-y-1">
+            <p className="text-xs text-gray-500">
+              Expires: {product.expiryDate.split("T")[0]}
+            </p>
+            <div className="flex space-x-1 items-baseline">
+             
+              <span className="text-sm line-through text-red-500">
+                ${product.price}
+              </span>
+              <span className="text-xl font-bold text-green-600">
+                ${product.discountedPrice}
+              </span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="p-4 border-t border-gray-200">
+        <Button variant="default" className="w-full flex items-center justify-center">
+          <PlusIcon className="w-4 h-4 mr-2" /> Add to Cart
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};

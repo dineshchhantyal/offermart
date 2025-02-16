@@ -2,6 +2,7 @@ import * as z from "zod";
 
 export const productSchema = z.object({
   // Basic Info
+
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   brand: z.string().min(2, "Brand must be at least 2 characters"),
@@ -78,6 +79,7 @@ export const ProductFormDefaults: Partial<ProductFormData> = {
   status: "DRAFT",
 };
 
+
 export const TAB_FIELDS = {
   basic: ["title", "description", "category", "images"],
   details: ["originalPrice", "price", "quantity", "unit", "condition"],
@@ -86,3 +88,10 @@ export const TAB_FIELDS = {
 } as const;
 
 export type TabType = keyof typeof TAB_FIELDS;
+
+export function productWithIdSchema(id: string) {
+  return productSchema.extend({
+    id: z.literal(id),
+  });
+}
+
