@@ -1,4 +1,4 @@
-# RenewMart
+# OfferMart
 
 A NextJS based e-commerce application for buying and selling renewable energy products.
 
