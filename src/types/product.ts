@@ -1,4 +1,5 @@
 import * as z from "zod";
+import { Product, Category, Image } from "@prisma/client";
 
 export const productSchema = z.object({
   // Basic Info
@@ -79,7 +80,6 @@ export const ProductFormDefaults: Partial<ProductFormData> = {
   status: "DRAFT",
 };
 
-
 export const TAB_FIELDS = {
   basic: ["title", "description", "category", "images"],
   details: ["originalPrice", "price", "quantity", "unit", "condition"],
@@ -95,3 +95,7 @@ export function productWithIdSchema(id: string) {
   });
 }
 
+export type ProductWithDetails = Product & {
+  category: Category;
+  images: Image[];
+};

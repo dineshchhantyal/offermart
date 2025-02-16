@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import PaymentMethodType from "prisma/client";
 
 import { toast } from "sonner";
 import { BasicInfoTab } from "./tabs/basic-info";
@@ -83,13 +82,13 @@ export function ProductForm() {
       const formattedData = {
         ...data,
         commission,
-        status: isDraft ? "DRAFT" : "PENDING",
+        status: isDraft ? "DRAFT" : "VERIFIED",
         manufacturerDate: data.manufacturerDate.toISOString(),
         expiryDate: data.expiryDate.toISOString(),
         bestBefore: data.bestBefore?.toISOString() || null,
         images: Array.isArray(data.images) ? data.images : [],
         // Format payment methods to match enum values
-        paymentMethods: data.paymentMethods as PaymentMethodType[],
+        paymentMethods: data.paymentMethods,
       };
 
       console.log("Creating product with data", formattedData);

@@ -4,15 +4,15 @@ import { currentUser } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const user = await currentUser();
+    const session = await currentUser();
 
-    if (!user?.id) {
+    if (!session?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const products = await db.product.findMany({
       where: {
-        sellerId: user.id,
+        sellerId: session.id,
       },
       include: {
         category: true,
