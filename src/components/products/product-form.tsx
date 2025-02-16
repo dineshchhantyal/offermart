@@ -198,6 +198,7 @@ export function ProductForm() {
 
       await onSubmit(form.getValues(), true);
     } catch (error) {
+      console.error("Failed to save draft", error);
       toast.error("Failed to save draft");
     } finally {
       setIsDraftSaving(false);

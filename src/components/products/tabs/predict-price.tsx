@@ -92,6 +92,7 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
 
       toast.success("Price recommendation calculated!");
     } catch (error) {
+      console.error("Failed to calculate price", error);
       toast.error("Failed to calculate price. Please try again.");
     } finally {
       setIsCalculating(false);
