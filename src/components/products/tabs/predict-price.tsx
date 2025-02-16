@@ -14,6 +14,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface PredictPriceTabProps {
   form: UseFormReturn<ProductFormData>;
@@ -28,6 +29,20 @@ interface PriceAnalysis {
     market: string;
   };
 }
+
+const PriceInput = ({
+  className,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) => {
+  return (
+    <div className="relative">
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+        $
+      </span>
+      <Input {...props} className={cn("pl-7", className)} />
+    </div>
+  );
+};
 
 const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
   const [isCalculating, setIsCalculating] = useState(false);
@@ -93,7 +108,7 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
             <FormItem>
               <FormLabel>Original Retail Price</FormLabel>
               <FormControl>
-                <Input
+                <PriceInput
                   type="number"
                   {...field}
                   onChange={(e) => {
@@ -142,7 +157,7 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
                     <FormItem>
                       <FormLabel>You Receive</FormLabel>
                       <FormControl>
-                        <Input
+                        <PriceInput
                           type="number"
                           readOnly
                           value={field.value || ""}
@@ -165,7 +180,7 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
                     <FormItem>
                       <FormLabel>Market Price</FormLabel>
                       <FormControl>
-                        <Input
+                        <PriceInput
                           type="number"
                           readOnly
                           value={field.value || ""}

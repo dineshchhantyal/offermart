@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import PaymentMethodType from "prisma/client";
 
 import { toast } from "sonner";
 import { BasicInfoTab } from "./tabs/basic-info";
@@ -72,10 +72,7 @@ export function ProductForm() {
     return commission;
   };
 
-  const onSubmit = async (
-    data: z.infer<typeof productSchema>,
-    isDraft: boolean = false
-  ) => {
+  const onSubmit = async (data: ProductFormData, isDraft: boolean = false) => {
     try {
       setError(undefined);
       setSuccess(undefined);
@@ -89,14 +86,13 @@ export function ProductForm() {
         status: isDraft ? "DRAFT" : "PENDING",
         manufacturerDate: data.manufacturerDate.toISOString(),
         expiryDate: data.expiryDate.toISOString(),
-        bestBefore: data.bestBefore?.toISOString(),
-        // Convert image objects to array of URLs if needed
+        bestBefore: data.bestBefore?.toISOString() || null,
         images: Array.isArray(data.images) ? data.images : [],
-        // Ensure payment methods match the enum
-        paymentMethods: data.paymentMethods.map((method) =>
-          method.replace(/\s+/g, "_").toUpperCase()
-        ),
+        // Format payment methods to match enum values
+        paymentMethods: data.paymentMethods as PaymentMethodType[],
       };
+
+      console.log("Creating product with data", formattedData);
 
       const response = await fetch("/api/products", {
         method: "POST",
@@ -190,6 +186,7 @@ export function ProductForm() {
   const handleSaveAsDraft = async () => {
     try {
       setIsDraftSaving(true);
+
       // Don't validate all fields for drafts
       const basicFieldsValid = await form.trigger(tabFields.basic);
       if (!basicFieldsValid) {

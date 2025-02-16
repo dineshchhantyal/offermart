@@ -96,7 +96,13 @@ const ProductDetailsTab = ({ form, className }: ProductDetailsTabProps) => {
               <FormItem>
                 <FormLabel>Quantity</FormLabel>
                 <FormControl>
-                  <Input type="number" min="1" {...field} />
+                  <Input
+                    type="number"
+                    min="1"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    value={field.value || ""}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

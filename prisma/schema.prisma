@@ -135,7 +135,7 @@ model Product {
   isDonation      Boolean       @default(false)
   commission      Float         @default(0.1)
   status          ProductStatus @default(PENDING)
-  paymentMethods  PaymentMethod[]
+  paymentMethods  PaymentMethodType[]
 
   seller         User         @relation("SellerProducts", fields: [sellerId], references: [id])
   sellerId       String
@@ -160,11 +160,6 @@ enum PaymentMethodType {
   MOBILE_PAYMENT
 }
 
-model PaymentMethod {
-  id       String           @id @default(cuid())
-  type     PaymentMethodType @unique
-  products Product[]
-}
 
 model Category {
   id       String    @id @default(cuid())

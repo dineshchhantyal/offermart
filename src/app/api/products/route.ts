@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { auth } from "../../../../auth";
+import { PaymentMethodType, ProductStatus } from "@prisma/client";
+import { currentUser } from "@/lib/auth";
 
 const dummyProducts = [
   {
@@ -76,25 +77,19 @@ const dummyProducts = [
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
+    const session = await currentUser();
     const body = await req.json();
 
-    if (!session?.user) {
+    if (!session?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // Format payment methods to match enum
-    const formattedPaymentMethods = body.paymentMethods.map(
-      (method: string) => ({
-        where: { type: method.toUpperCase() as PaymentMethodType },
-        create: { type: method.toUpperCase() as PaymentMethodType },
-      })
-    );
 
     // Create product with proper connections
     const product = await db.product.create({
       data: {
-        ...body,
+        title: body.title,
+        description: body.description,
+        brand: body.brand,
         category: {
           connectOrCreate: {
             where: { name: body.category },
@@ -103,7 +98,7 @@ export async function POST(req: Request) {
         },
         seller: {
           connect: {
-            id: session.user.id,
+            id: session.id,
           },
         },
         images: {
@@ -111,15 +106,29 @@ export async function POST(req: Request) {
             url,
           })),
         },
-        paymentMethods: {
-          connectOrCreate: formattedPaymentMethods,
-        },
+        originalPrice: body.originalPrice,
+        price: body.price,
+        discountedPrice: body.discountedPrice,
+        quantity: body.quantity,
+        unit: body.unit,
+        condition: body.condition,
+        manufacturerDate: new Date(body.manufacturerDate),
+        expiryDate: new Date(body.expiryDate),
+        bestBefore: body.bestBefore ? new Date(body.bestBefore) : null,
+        pickupAddress: body.pickupAddress,
+        isDeliveryAvailable: body.isDeliveryAvailable,
+        isDonation: body.isDonation,
+        commission: body.commission,
+        status: body.status as ProductStatus,
+        // Correctly handle payment methods as enum array
+        paymentMethods: body.paymentMethods.map(
+          (method: string) => method.toUpperCase() as PaymentMethodType
+        ),
       },
       include: {
         seller: true,
         category: true,
         images: true,
-        paymentMethods: true,
       },
     });
 
@@ -128,7 +137,6 @@ export async function POST(req: Request) {
     const errorMessage =
       error instanceof Error ? error.message : "Internal server error";
     console.error("[PRODUCTS_POST]", errorMessage);
-
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
