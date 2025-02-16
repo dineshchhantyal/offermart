@@ -92,7 +92,7 @@ const ProductPage: React.FC = () => {
             }
             className={`px-4 py-2 rounded ${
               selectedCategories.includes(category)
-                ? "text-white bg-blue-500"
+                ? "text-white"
                 : "text-black bg-gray-200"
             }`}
           >
