@@ -39,12 +39,14 @@ export default function Home() {
             {[
               {
                 title: "List Your Products",
-                description: "Choose between commission-free or commission-based listings.",
+                description:
+                  "Choose between commission-free or commission-based listings.",
                 icon: "📦",
               },
               {
                 title: "AI Quality Check",
-                description: "Our AI assesses product quality and remaining shelf life.",
+                description:
+                  "Our AI assesses product quality and remaining shelf life.",
                 icon: "🤖",
               },
               {
@@ -61,7 +63,9 @@ export default function Home() {
                 <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
                   {title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-300">{description}</p>
+                <p className="text-gray-600 dark:text-gray-300">
+                  {description}
+                </p>
               </div>
             ))}
           </div>
@@ -72,7 +76,7 @@ export default function Home() {
       <section className="py-20 bg-green-100 dark:bg-green-950">
         <div className="container mx-auto text-center">
           <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-12">
-            Our Impact
+            Our Goal
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -80,7 +84,10 @@ export default function Home() {
               { value: "500+", label: "Active Users" },
               { value: "2 tons", label: "Waste Reduced" },
             ].map(({ value, label }, index) => (
-              <div key={index} className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md">
+              <div
+                key={index}
+                className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md"
+              >
                 <div className="text-5xl font-bold text-green-700 dark:text-green-400 mb-2">
                   {value}
                 </div>
