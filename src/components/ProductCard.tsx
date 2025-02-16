@@ -10,7 +10,7 @@ export interface Product {
   description: string;
   brand: string;
   category: string;
-  images: string[];
+  images: {url:string}[];
   originalPrice: number;
   price: number;
   discountedPrice: number;
@@ -41,7 +41,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <figure className="relative">
         <Image 
           className="w-full h-56 object-cover"
-          src={product.images[0]}
+          src={product.images[0].url}
           width={300}
           height={224}
           alt={product.title}
