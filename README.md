@@ -1,17 +1,62 @@
 # RenewMart
 
-A sustainable e-commerce platform built with Next.js 14, focusing on buying and selling renewable energy products and reducing waste through reuse and recycling.
+A community-driven marketplace platform focused on reducing waste by connecting sellers of near-expiry goods with conscious buyers. Built with Next.js 14, the platform serves both B2B businesses and individual users.
 
 ## Overview
 
-RenewMart connects environmentally conscious buyers with sellers offering sustainable and renewable energy products. Our platform aims to reduce waste and promote eco-friendly commerce.
+RenewMart empowers businesses and individuals to extend the life of near-expiry products through sales or donations. Our AI-powered platform ensures quality verification while promoting sustainable commerce and community impact.
 
 ### Key Goals
 
-- Reduce waste through product reuse
-- Support sustainable energy initiatives
-- Create a community of eco-conscious traders
-- Promote transparent and secure transactions
+- Reduce waste through smart inventory management
+- Connect businesses with cost-conscious buyers
+- Enable individual participation in waste reduction
+- Promote both commercial and donation-based transactions
+- Verify product quality through AI technology
+
+## Core Features
+
+### Dual Sales Channels
+
+#### B2B Platform
+
+- Bulk listing capabilities
+- Digital marketplace presence
+- Physical store placement options
+- Contractual agreement management
+- Business-specific analytics
+
+#### Individual Sellers
+
+- Single item listings
+- Flexible pricing options
+- Donation capabilities
+- Personal dashboard
+- Transaction history
+
+### AI-Powered Verification
+
+- Image-based quality assessment
+- Expiration date verification
+- Product authenticity checks
+- Automated listing validation
+- Real-time feedback system
+
+### Smart Logistics
+
+- Seller-managed delivery options
+- Pickup arrangement facilitation
+- Secure contact exchange
+- Location-based matching
+- Delivery tracking integration
+
+### Financial Structure
+
+- 10% standard commission
+- Commission-free donations
+- Secure payment processing
+- Automated profit sharing
+- Transaction history tracking
 
 ## Tech Stack
 
@@ -37,41 +82,23 @@ RenewMart connects environmentally conscious buyers with sellers offering sustai
 - Husky - Git hooks
 - Jest - Testing framework
 
-## Features
+## Platform Architecture
 
-### User Management
+### Frontend Features
 
-- Email & Social authentication
-- User profiles with ratings
-- Seller verification system
-
-### Product Management
-
-- Multi-image product listings
-- Category-based navigation
-- Advanced search and filters
-- Condition tracking (New/Used)
-
-### Shopping Experience
-
-- Real-time cart management
-- Secure checkout process
-- Multiple payment methods
-- Order tracking system
-
-### Seller Tools
-
-- Product listing dashboard
-- Order management
-- Analytics and insights
-- Inventory tracking
-
-### Platform Features
-
-- Dark/Light mode
-- Responsive design
+- Responsive design for all devices
+- Dark/Light mode support
 - Real-time notifications
-- SEO optimization
+- Advanced search and filters
+- Interactive dashboard
+
+### Backend Capabilities
+
+- AI verification pipeline
+- Real-time data processing
+- Secure authentication
+- Payment processing
+- Analytics engine
 
 ## Getting Started
 
@@ -81,62 +108,64 @@ RenewMart connects environmentally conscious buyers with sellers offering sustai
 - PostgreSQL
 - npm/yarn/pnpm
 
-### Environment Setup
+## Development
 
-Copy `.env.example` to `.env` and update with your values:
-
-```bash
-cp .env.example .env
-```
-
-### Installation
+### Local Development
 
 ```bash
+# Clone the repository
+git clone https://github.com/dineshchhantyal/offer-mart
+
 # Install dependencies
 npm install
 
-# Setup database
+# Copy environment variables
+cp .env.example .env
+
+# Set up the database
 npx prisma generate
 npx prisma db push
 
-# Run development server
+# Start the development server
 npm run dev
-```
 
-The application will be available at [http://localhost:3000](http://localhost:3000)
-
-### Development Commands
-
-```bash
-# Type checking
-npm run type-check
-
-# Linting
-npm run lint
-
-# Format code
-npm run format
-
-# Run tests
-npm run test
-
-# Build for production
-npm run build
-```
 
 ## Project Structure
 
 ```
+
 renew-mart/
 ├── src/
-│   ├── app/          # Next.js 14 app router
-│   ├── components/   # Reusable components
-│   ├── lib/         # Utilities and configurations
-│   ├── store/       # Redux store setup
-│   └── types/       # TypeScript definitions
-├── prisma/          # Database schema and migrations
-├── public/          # Static assets
-└── tests/           # Test suites
+│ ├── app/ # Next.js 14 app router
+│ ├── components/ # Reusable components
+│ ├── lib/ # Utilities and configurations
+│ ├── store/ # Redux store setup
+│ └── types/ # TypeScript definitions
+├── prisma/ # Database schema and migrations
+├── public/ # Static assets
+└── tests/ # Test suites
+
+````
+
+## API Documentation
+
+### Product Endpoints
+
+```typescript
+POST /api/products
+GET /api/products
+GET /api/products/:id
+PUT /api/products/:id
+DELETE /api/products/:id
+````
+
+### Authentication Endpoints
+
+```typescript
+POST / api / auth / register;
+POST / api / auth / login;
+POST / api / auth / verify;
+GET / api / auth / me;
 ```
 
 ## Contributing
