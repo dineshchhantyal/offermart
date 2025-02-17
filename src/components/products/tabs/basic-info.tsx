@@ -74,7 +74,6 @@ export function BasicInfoTab({ form }: BasicInfoTabProps) {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="title"
@@ -88,7 +87,6 @@ export function BasicInfoTab({ form }: BasicInfoTabProps) {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="description"
@@ -102,7 +100,6 @@ export function BasicInfoTab({ form }: BasicInfoTabProps) {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="brand"
@@ -116,7 +113,6 @@ export function BasicInfoTab({ form }: BasicInfoTabProps) {
             </FormItem>
           )}
         />
-
         <FormField
           control={form.control}
           name="categoryId"
@@ -139,6 +135,30 @@ export function BasicInfoTab({ form }: BasicInfoTabProps) {
                       {category.name}
                     </SelectItem>
                   ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* condition */}
+        <FormField
+          control={form.control}
+          name="condition"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Condition</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select condition" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="NEW">New</SelectItem>
+                  <SelectItem value="LIKE_NEW">Like New</SelectItem>
+                  <SelectItem value="GOOD">Good</SelectItem>
+                  <SelectItem value="FAIR">Fair</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />

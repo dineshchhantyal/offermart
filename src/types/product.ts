@@ -3,33 +3,96 @@ import * as z from "zod";
 
 export const productSchema = z.object({
   // Basic Info
-
-  title: z.string().min(3, "Title must be at least 3 characters"),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  brand: z.string().min(2, "Brand must be at least 2 characters"),
-  images: z.array(z.string().url()).min(1, "At least one image is required"),
+  title: z
+    .string({
+      required_error: "Title is required",
+    })
+    .min(3, "Title must be at least 3 characters"),
+  description: z
+    .string({
+      required_error: "Description is required",
+    })
+    .min(10, "Description must be at least 10 characters"),
+  brand: z
+    .string({
+      required_error: "Brand is required",
+    })
+    .min(2, "Brand must be at least 2 characters"),
+  images: z
+    .array(
+      z
+        .string({
+          required_error: "Image URL is required",
+        })
+        .url("Please provide a valid image URL")
+    )
+    .min(1, "At least one image is required"),
 
   categoryId: z.string({
     required_error: "Please select a category",
   }),
+  condition: z.enum(["NEW", "LIKE_NEW", "GOOD", "FAIR"], {
+    required_error: "Product condition is required",
+  }),
 
   // Pricing
-  originalPrice: z.number().positive("Original price must be positive"),
-  price: z.number().min(0, "Price must be positive"),
-  discountedPrice: z.number().min(0, "Price must be positive").optional(),
+  originalPrice: z
+    .number({
+      required_error: "Original price is required",
+    })
+    .positive("Original price must be positive"),
+  price: z
+    .number({
+      required_error: "Price is required",
+    })
+    .min(0, "Price must be positive"),
+  discountedPrice: z
+    .number({
+      invalid_type_error: "Discounted price must be a number",
+      required_error: "Get a price quote from us",
+    })
+
+    .min(0, "Discounted price must be positive"),
+
   // Product Details
-  quantity: z.number().int().min(1, "Quantity must be at least 1"),
-  unit: z.string().min(1, "Please specify the unit"),
-  size: z.string().optional(),
-  condition: z.enum(["NEW", "LIKE_NEW", "GOOD", "FAIR"]),
+  quantity: z
+    .number({
+      required_error: "Quantity is required",
+      invalid_type_error: "Quantity must be a number",
+    })
+    .int("Quantity must be a whole number")
+    .min(1, "Quantity must be at least 1"),
+  unit: z
+    .string({
+      required_error: "Unit is required",
+    })
+    .min(1, "Please specify the unit"),
+  size: z
+    .string({
+      invalid_type_error: "Size must be a string",
+    })
+    .optional(),
+  condition: z.enum(["NEW", "LIKE_NEW", "GOOD", "FAIR"], {
+    required_error: "Product condition is required",
+  }),
 
   // Dates
   manufacturerDate: z
-    .date()
+    .date({
+      required_error: "Manufacturer date is required",
+      invalid_type_error: "Please provide a valid date",
+    })
     .max(new Date(), "Manufacturer date cannot be in the future"),
-  expiryDate: z.date().min(new Date(), "Expiry date must be in the future"),
+  expiryDate: z
+    .date({
+      required_error: "Expiry date is required",
+      invalid_type_error: "Please provide a valid date",
+    })
+    .min(new Date(), "Expiry date must be in the future"),
   bestBefore: z
-    .date()
+    .date({
+      invalid_type_error: "Please provide a valid date",
+    })
     .optional()
     .refine((date) => {
       if (!date) return true;
@@ -37,9 +100,18 @@ export const productSchema = z.object({
     }, "Best before date must be within 90 days"),
 
   // Location and Delivery
-  pickupAddress: z.string().min(5, "Please provide a valid pickup address"),
+  pickupAddress: z
+    .string({
+      required_error: "Pickup address is required",
+    })
+    .min(5, "Please provide a valid pickup address"),
   isDeliveryAvailable: z.boolean().default(false),
-  deliveryFee: z.number().min(0).optional(),
+  deliveryFee: z
+    .number({
+      invalid_type_error: "Delivery fee must be a number",
+    })
+    .min(0, "Delivery fee cannot be negative")
+    .optional(),
   deliveryNotes: z.string().optional(),
 
   // Additional Info
@@ -47,12 +119,18 @@ export const productSchema = z.object({
   storageInfo: z.string().optional(),
 
   // Payment and Status
-  isDonation: z.boolean(),
+  isDonation: z.boolean({
+    required_error: "Please specify if this is a donation",
+  }),
   paymentMethods: z
-    .array(z.enum(["CASH", "BANK_TRANSFER", "MOBILE_PAYMENT", "CARD"]))
+    .array(z.enum(["CASH", "BANK_TRANSFER", "MOBILE_PAYMENT", "CARD"]), {
+      required_error: "Payment methods are required",
+    })
     .min(1, "Select at least one payment method"),
   status: z
-    .enum(["DRAFT", "PENDING", "VERIFIED", "REJECTED"])
+    .enum(["DRAFT", "PENDING", "VERIFIED", "REJECTED"], {
+      required_error: "Status is required",
+    })
     .default("PENDING"),
 });
 

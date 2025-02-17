@@ -51,8 +51,6 @@ export function ProductForm() {
     },
   });
 
-  console.log("Form values", form.formState.errors);
-
   const discountedPrice = form.watch("discountedPrice");
 
   const calculateCommission = (data: ProductFormData) => {
@@ -81,6 +79,11 @@ export function ProductForm() {
     try {
       setError(undefined);
       setSuccess(undefined);
+
+      if (discountedPrice === 0 && !form.getValues("isDonation")) {
+        toast.error("Discounted price cannot be zero");
+        return;
+      }
 
       const commission = calculateCommission(data);
 
@@ -142,7 +145,7 @@ export function ProductForm() {
   const isLastTab = currentTabIndex === TABS.length - 1;
 
   const tabFields = {
-    basic: ["title", "description", "images", "categoryId"],
+    basic: ["title", "description", "images", "categoryId", "condition"],
     details: [
       "originalPrice",
       "price",
@@ -216,8 +219,13 @@ export function ProductForm() {
       setIsDraftSaving(false);
     }
   };
-
+  console.log("is last tab", isLastTab);
   const handleListProduct = async (data: ProductFormData) => {
+    // Only allow submission from the last tab
+    if (!isLastTab) {
+      return;
+    }
+
     try {
       setIsListing(true);
       await onSubmit(data, false);
@@ -229,7 +237,14 @@ export function ProductForm() {
   return (
     <FormProvider {...form}>
       <form
-        onSubmit={form.handleSubmit(handleListProduct)}
+        onSubmit={(e) => {
+          // Prevent submission if not on last tab
+          if (!isLastTab) {
+            e.preventDefault();
+            return;
+          }
+          form.handleSubmit(handleListProduct)(e);
+        }}
         className="space-y-8"
       >
         {error && (

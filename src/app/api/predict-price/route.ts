@@ -10,6 +10,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { originalPrice } = body;
+    const todayDate = new Date();
 
     const analysis = await openai.chat.completions.create({
       model: "deepseek-chat",
@@ -17,7 +18,8 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "system",
-          content: `You are a product pricing expert. Analyze the product and return a JSON object. The user might put random details in the product, so make sure to extract the price and other necessary details. The user might also put irrelevant details, so ignore them. The user might also put the price in a different currency, so make sure to convert it to the local currency. The user might also put the price in a different format, so make sure to extract the price correctly. The user might also put the price in a different unit, so make sure to convert it to the local unit. The user might also put the price in a different quantity, so make sure to extract the price correctly. The user might also put the price in a different condition, so make sure to extract the price correctly. The user might also put the price in a different status, so make sure to extract the price correctly. The user might also put the price in a different category, so make sure to extract the price correctly.
+          content: `You are a product pricing expert. Analyze the product details and suggest a fair price.
+          Today's date: ${todayDate.toISOString()}
 
           Response format:
           {
@@ -29,7 +31,7 @@ export async function POST(request: Request) {
           }
 
           Rules:
-          1. Return ONLY the JSON object, no other text
+          1. Return ONLY the JSON object
           2. percentage must be between 40 and 60
           3. Better condition items get higher percentage
           4. Items near expiry get lower percentage
@@ -37,32 +39,43 @@ export async function POST(request: Request) {
         },
         {
           role: "user",
-          content: `Analyze and price this product:
-          ${JSON.stringify(body, null, 2)}
-          `,
+          content: `Analyze this product: ${JSON.stringify(body)}`,
         },
       ],
+      max_tokens: 500,
     });
 
-    let aiResponse;
-    try {
-      const content = analysis.choices[0].message.content?.trim() ?? "";
-      // Remove any markdown formatting if present
-      const jsonContent = content.replace(/```json\n?|\n?```/g, "").trim();
-      aiResponse = JSON.parse(jsonContent);
+    // Handle API response with proper error checking
+    if (!analysis.choices || analysis.choices.length === 0) {
+      throw new Error("No response from AI service");
+    }
 
-      // Validate response structure
-      if (
-        !aiResponse ||
-        typeof aiResponse.percentage !== "number" ||
-        aiResponse.percentage < 40 ||
-        aiResponse.percentage > 60
-      ) {
-        throw new Error("Invalid AI response format");
+    let aiResponse = null;
+    for (const choice of analysis.choices) {
+      try {
+        const content = choice.message?.content?.trim() ?? "";
+        // Remove any markdown formatting if present
+        const jsonContent = content.replace(/```json\n?|\n?```/g, "").trim();
+        const parsed = JSON.parse(jsonContent);
+
+        // Validate response structure
+        if (
+          parsed &&
+          typeof parsed.percentage === "number" &&
+          parsed.percentage >= 40 &&
+          parsed.percentage <= 60
+        ) {
+          aiResponse = parsed;
+          break;
+        }
+      } catch (parseError) {
+        console.error("Failed to parse choice:", parseError);
+        continue;
       }
-    } catch (parseError) {
-      console.error("AI response parsing error:", parseError);
-      throw new Error("Failed to parse AI response");
+    }
+
+    if (!aiResponse) {
+      throw new Error("Could not get valid response from any choices");
     }
 
     const suggestedPercentage = aiResponse.percentage / 100;
@@ -85,12 +98,20 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Price prediction error:", error);
+
+    // More detailed error response
     return NextResponse.json(
       {
         error: "Failed to calculate price",
         details: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString(),
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
     );
   }
 }
