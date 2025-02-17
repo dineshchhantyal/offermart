@@ -26,13 +26,24 @@ import {
   AlertCircle,
   Save,
   Send,
+  FileText,
+  Package,
+  Truck,
+  CreditCard,
+  DollarSign,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PredictPriceTab from "./tabs/predict-price";
 import { useRouter } from "next/navigation";
 
-const TABS = ["basic", "details", "delivery", "payment", "price"] as const;
-type TabType = (typeof TABS)[number];
+const TABS = [
+  { id: "basic", label: "Basic Info", icon: FileText },
+  { id: "details", label: "Product Details", icon: Package },
+  { id: "delivery", label: "Delivery", icon: Truck },
+  { id: "payment", label: "Payment", icon: CreditCard },
+  { id: "price", label: "Pricing", icon: DollarSign },
+] as const;
+type TabType = (typeof TABS)[number]["id"];
 
 export function ProductForm() {
   const [activeTab, setActiveTab] = useState<TabType>("basic");
@@ -140,7 +151,7 @@ export function ProductForm() {
     }
   };
 
-  const currentTabIndex = TABS.indexOf(activeTab);
+  const currentTabIndex = TABS.findIndex((tab) => tab.id === activeTab);
   const isFirstTab = currentTabIndex === 0;
   const isLastTab = currentTabIndex === TABS.length - 1;
 
@@ -182,7 +193,7 @@ export function ProductForm() {
       return;
     }
 
-    const nextTab = TABS[currentTabIndex + 1];
+    const nextTab = TABS[currentTabIndex + 1].id;
     setActiveTab(nextTab);
   };
 
@@ -261,32 +272,59 @@ export function ProductForm() {
           </Alert>
         )}
 
+        <div className="mb-8">
+          <div className="relative">
+            {/* Progress bar */}
+            <div className="absolute top-1/2 h-0.5 w-full bg-gray-200 -translate-y-1/2">
+              <div
+                className="h-full bg-primary transition-all duration-300"
+                style={{
+                  width: `${(currentTabIndex / (TABS.length - 1)) * 100}%`,
+                }}
+              />
+            </div>
+
+            {/* Tab indicators */}
+            <div className="relative z-10 grid grid-cols-5 gap-4">
+              {TABS.map((tab, index) => {
+                const Icon = tab.icon;
+                const isActive = index === currentTabIndex;
+                const isCompleted = index < currentTabIndex;
+                const hasErrors = getTabErrors(tab.id as TabType);
+
+                return (
+                  <div key={tab.id} className="flex flex-col items-center">
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange(tab.id as TabType)}
+                      className={cn(
+                        "relative flex h-10 w-10 items-center justify-center rounded-full transition-all",
+                        isActive && "bg-primary text-white",
+                        isCompleted && "bg-primary/20",
+                        !isActive && !isCompleted && "bg-gray-100",
+                        hasErrors && "ring-2 ring-destructive"
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
+                      {hasErrors && (
+                        <span className="absolute -top-1 -right-1 h-3 w-3 rounded-full bg-destructive" />
+                      )}
+                    </button>
+                    <span className="mt-2 text-xs font-medium">
+                      {tab.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         <Tabs
           value={activeTab}
           onValueChange={(tab) => handleTabChange(tab as TabType)}
           className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-5">
-            {TABS.map((tab) => {
-              const tabErrors = getTabErrors(tab);
-              return (
-                <TabsTrigger
-                  key={tab}
-                  value={tab}
-                  className={cn(
-                    "capitalize relative",
-                    tabErrors && "text-destructive"
-                  )}
-                >
-                  {tab}
-                  {tabErrors && (
-                    <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full" />
-                  )}
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
-
           <TabsContent value="basic">
             <BasicInfoTab form={form} />
           </TabsContent>
@@ -322,12 +360,14 @@ export function ProductForm() {
           </Alert>
         )}
 
-        <div className="flex justify-between gap-4">
+        <div className="sticky bottom-0 mt-8 flex justify-between gap-4 bg-white p-4 border-t">
           <div className="flex gap-2">
             <Button
               type="button"
               variant="outline"
-              onClick={() => handleTabChange(TABS[currentTabIndex - 1])}
+              onClick={() =>
+                handleTabChange(TABS[currentTabIndex - 1].id as TabType)
+              }
               disabled={isFirstTab || isDraftSaving || isListing}
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
@@ -341,48 +381,41 @@ export function ProductForm() {
               disabled={isDraftSaving || isListing}
             >
               {isDraftSaving ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Saving Draft...
-                </>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
-                <>
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Draft
-                </>
+                <Save className="mr-2 h-4 w-4" />
               )}
+              Save Draft
             </Button>
           </div>
 
-          {isLastTab ? (
-            <Button
-              type="submit"
-              className="flex-1"
-              disabled={isDraftSaving || isListing}
-            >
-              {isListing ? (
-                <>
+          <div className="flex gap-2">
+            {!isLastTab && (
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={isDraftSaving || isListing}
+                className="flex-1"
+              >
+                Next
+                <ChevronRight className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+            {isLastTab && (
+              <Button
+                type="submit"
+                className="flex-1"
+                disabled={isDraftSaving || isListing}
+              >
+                {isListing ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Publishing...
-                </>
-              ) : (
-                <>
+                ) : (
                   <Send className="mr-2 h-4 w-4" />
-                  Publish Product
-                </>
-              )}
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              onClick={handleNext}
-              disabled={isDraftSaving || isListing || discountedPrice === 0}
-              className="flex-1"
-            >
-              Next
-              <ChevronRight className="ml-2 h-4 w-4" />
-            </Button>
-          )}
+                )}
+                Publish Product
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Show processing indicator */}
