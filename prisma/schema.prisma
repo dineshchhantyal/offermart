@@ -67,6 +67,8 @@ model User {
   bio                  String?                @db.Text
   contactEmail         String?
   phoneNumber          String?
+  orders               Order[]
+  orderItems           OrderItem[]
 
   createdAt DateTime @default(now())
   @@map("users")
@@ -151,6 +153,7 @@ model Product {
   updatedAt      DateTime     @updatedAt
   images         Image[]
   sales          Sale[]
+  orderItems     OrderItem[]
 
   @@index([sellerId])
 }
@@ -228,5 +231,51 @@ model Sale {
 enum SaleStatus {
   PENDING
   COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id                   String       @id @default(cuid())
+  user                 User         @relation(fields: [userId], references: [id])
+  userId               String
+  status               OrderStatus  @default(PENDING)
+  shippingAddress      String
+  city                 String
+  state                String
+  zipCode              String
+  phoneNumber          String
+  email                String
+  deliveryInstructions String?
+  total                Float
+  items                OrderItem[]
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  @@index([userId])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  price     Float
+  sellerId  String
+  seller    User     @relation(fields: [sellerId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@index([sellerId])
+  @@map("order_items")
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
   CANCELLED
 }
