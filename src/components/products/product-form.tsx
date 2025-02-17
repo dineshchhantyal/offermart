@@ -51,6 +51,8 @@ export function ProductForm() {
     },
   });
 
+  console.log("Form values", form.formState.errors);
+
   const discountedPrice = form.watch("discountedPrice");
 
   const calculateCommission = (data: ProductFormData) => {
