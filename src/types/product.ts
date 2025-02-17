@@ -1,8 +1,4 @@
-import {
-  ItemCondition,
-  PaymentMethodType,
-  ProductStatus,
-} from "@prisma/client";
+import { PaymentMethodType, ProductStatus } from "@prisma/client";
 import * as z from "zod";
 
 export const productSchema = z.object({
@@ -143,6 +139,10 @@ export const PaymentMethodEnum = z.enum([
   "CARD",
 ]);
 export type PaymentMethod = z.infer<typeof PaymentMethodEnum>;
+
+// Add type safety for product condition
+export const ItemConditionEnum = z.enum(["NEW", "LIKE_NEW", "GOOD", "FAIR"]);
+export type ItemCondition = z.infer<typeof ItemConditionEnum>;
 
 export type ProductFormData = z.infer<typeof productSchema>;
 
