@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
+interface AIResponse {
+  percentage: number;
+  reasoning: string;
+  condition_factor: string;
+  expiry_factor: string;
+  market_factor: string;
+}
+
 const openai = new OpenAI({
   baseURL: "https://api.deepseek.com",
   apiKey: process.env.DEEPSEEK_API_KEY,
@@ -42,15 +50,14 @@ export async function POST(request: Request) {
           content: `Analyze this product: ${JSON.stringify(body)}`,
         },
       ],
-      max_tokens: 500,
     });
+    let aiResponse: AIResponse | null = null;
 
     // Handle API response with proper error checking
     if (!analysis.choices || analysis.choices.length === 0) {
       throw new Error("No response from AI service");
     }
 
-    let aiResponse = null;
     for (const choice of analysis.choices) {
       try {
         const content = choice.message?.content?.trim() ?? "";
