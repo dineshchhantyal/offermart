@@ -21,6 +21,7 @@ export function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="max-w-4xl mx-auto text-center"
+          suppressHydrationWarning
         >
           <motion.div
             className="flex items-center justify-center gap-2 mb-4"
@@ -95,6 +96,7 @@ export function HeroSection() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
             className="mt-16 flex flex-col items-center gap-4"
+            suppressHydrationWarning
           >
             <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500">
               <div className="flex items-center gap-2">
