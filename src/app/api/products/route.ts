@@ -41,7 +41,8 @@ const dummyProducts = [
   {
     id: "4",
     title: "Extra Strength Pain Relief Tablets",
-    description: "Effective relief from headaches, muscle aches, and arthritis.",
+    description:
+      "Effective relief from headaches, muscle aches, and arthritis.",
     brand: "Medi-First",
     categoryId: "cat4",
     price: 10,
@@ -143,7 +144,8 @@ const dummyProducts = [
   {
     id: "7",
     title: "Extra Strength Pain Relief Tablets",
-    description: "Fast-acting relief for headaches, muscle aches, and joint pain.",
+    description:
+      "Fast-acting relief for headaches, muscle aches, and joint pain.",
     brand: "ReliefPro",
     categoryId: "cat4",
     price: 12,
@@ -173,81 +175,109 @@ const dummyProducts = [
     sellerId: "seller7",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
-
+  },
 ];
-
-
-
 
 export async function POST(req: Request) {
   try {
     const session = await currentUser();
-    const body = await req.json();
-
     if (!session?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const body = await req.json();
+
+    // Input validation
+    if (!body.categoryId) {
+      return NextResponse.json(
+        { error: "Category ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Format images array
+    const formattedImages = Array.isArray(body.images)
+      ? body.images.map((image: string | { url: string }) => ({
+          url: typeof image === "string" ? image : image.url,
+        }))
+      : [];
+
     // Create product with proper connections
     const product = await db.product.create({
       data: {
-        title: body.title,
-        description: body.description,
-        brand: body.brand,
-        category: {
-          connectOrCreate: {
-            where: { name: body.category },
-            create: { name: body.category },
-          },
-        },
-        seller: {
-          connect: {
-            id: session.id,
-          },
-        },
-        images: {
-          create: body.images.map((url: string) => ({
-            url,
-          })),
-        },
-        originalPrice: body.originalPrice,
-        price: body.price,
-        discountedPrice: body.discountedPrice,
-        quantity: body.quantity,
-        unit: body.unit,
-        condition: body.condition,
-        manufacturerDate: new Date(body.manufacturerDate),
-        expiryDate: new Date(body.expiryDate),
+        title: body.title || "Untitled Product",
+        description: body.description || "",
+        brand: body.brand || "",
+        categoryId: body.categoryId,
+        sellerId: session.id,
+        price: parseFloat(body.price) || 0,
+        discountedPrice: parseFloat(body.discountedPrice) || 0,
+        originalPrice: parseFloat(body.originalPrice) || 0,
+        quantity: parseInt(body.quantity) || 1,
+        unit: body.unit || "pieces",
+        condition: body.condition || "NEW",
+        manufacturerDate: body.manufacturerDate
+          ? new Date(body.manufacturerDate)
+          : new Date(),
+        expiryDate: body.expiryDate
+          ? new Date(body.expiryDate)
+          : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
         bestBefore: body.bestBefore ? new Date(body.bestBefore) : null,
-        pickupAddress: body.pickupAddress,
-        isDeliveryAvailable: body.isDeliveryAvailable,
-        isDonation: body.isDonation,
-        commission: body.commission,
-        status: body.status as ProductStatus,
-        // Correctly handle payment methods as enum array
-        paymentMethods: body.paymentMethods.map(
-          (method: string) => method.toUpperCase() as PaymentMethodType
-        ),
+        pickupAddress: body.pickupAddress || "",
+        isDeliveryAvailable: Boolean(body.isDeliveryAvailable),
+        isDonation: Boolean(body.isDonation),
+        commission: parseFloat(body.commission) || 0.1,
+        status: (body.status as ProductStatus) || "VERIFIED",
+        paymentMethods: Array.isArray(body.paymentMethods)
+          ? body.paymentMethods.map(
+              (method: string) => method.toUpperCase() as PaymentMethodType
+            )
+          : ["CASH"],
+        images: {
+          create: formattedImages,
+        },
       },
       include: {
-        seller: true,
+        seller: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
         category: true,
         images: true,
       },
     });
 
-    return NextResponse.json({ data: product });
+    return NextResponse.json({
+      success: true,
+      data: product,
+    });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal server error";
-    console.error("[PRODUCTS_POST]", errorMessage);
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    console.error("[PRODUCTS_POST]", error);
+
+    // Proper error handling with specific messages
+    if (error instanceof Error) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: error.message,
+        },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: "An unexpected error occurred",
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function GET() {
   return NextResponse.json({ data: dummyProducts });
 }
-
-
