@@ -4,6 +4,7 @@ import LogoLink from "../LogoLink";
 import { LoginButton } from "../auth/login-button";
 import { Button } from "../ui/button";
 import { UserButton } from "../auth/user-button";
+import { CartButton } from "../cart/CartButton";
 
 interface HeaderProps {
   label: string;
@@ -17,25 +18,26 @@ export const Header = async ({ label }: HeaderProps) => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <LogoLink showText={true} />
 
-        <div className="flex space-x-4">
-          {!user && (
-            <>
-              <LoginButton mode="modal" asChild>
-                <Button variant={"outline"}>Sign In</Button>
-              </LoginButton>
-              <LoginButton mode="modal" asChild>
-                <Button>Sign Up</Button>
-              </LoginButton>
-            </>
-          )}
+        <div className="flex items-center space-x-4">
           {user && (
             <>
+              <CartButton />
               <Link href="/sell">
-                <Button variant={"outline"} className="text-primary">
+                <Button variant="outline" className="text-primary">
                   Sell
                 </Button>
               </Link>
               <UserButton />
+            </>
+          )}
+          {!user && (
+            <>
+              <LoginButton mode="modal" asChild>
+                <Button variant="outline">Sign In</Button>
+              </LoginButton>
+              <LoginButton mode="modal" asChild>
+                <Button>Sign Up</Button>
+              </LoginButton>
             </>
           )}
         </div>

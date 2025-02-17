@@ -1,5 +1,5 @@
+import { PaymentMethodType, ProductStatus } from "@prisma/client";
 import * as z from "zod";
-import { Product, Category, Image, User } from "@prisma/client";
 
 export const productSchema = z.object({
   // Basic Info
@@ -95,9 +95,59 @@ export function productWithIdSchema(id: string) {
   });
 }
 
-export type ProductWithDetails = Product & {
-  category: Category;
-  images: Image[];
-  seller: User;
-  paymentMethods: PaymentMethod[];
-};
+export interface ProductWithDetails {
+  id: string;
+  title: string;
+  description: string;
+  brand: string;
+  categoryId: string;
+  price: number;
+  discountedPrice: number;
+  originalPrice?: number | null;
+  quantity: number;
+  unit: string;
+  condition: ItemCondition;
+
+  // Dates
+  manufacturerDate?: Date | null;
+  bestBefore?: Date | null;
+  expiryDate: Date;
+
+  // Location and Delivery
+  pickupAddress: string;
+  isDeliveryAvailable: boolean;
+  deliveryFee?: number | null;
+  deliveryNotes?: string | null;
+
+  // Product Details
+  allergenInfo?: string | null;
+  storageInfo?: string | null;
+  size?: string | null;
+
+  // Payment and Status
+  isDonation: boolean;
+  commission: number;
+  status: ProductStatus;
+  paymentMethods: PaymentMethodType[];
+
+  // Relations
+  sellerId: string;
+  seller: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+  category: {
+    id: string;
+    name: string;
+  };
+  images: Array<{
+    id: string;
+    url: string;
+    productId: string;
+  }>;
+
+  // Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+}

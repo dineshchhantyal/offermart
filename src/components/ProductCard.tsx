@@ -2,17 +2,28 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { HeartIcon, PlusIcon } from "lucide-react";
+import { HeartIcon, ShoppingCart } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { ProductWithDetails } from "@/types/product";
+import { useDispatch } from "react-redux";
+import { addItem } from "@/redux/features/cartSlice";
+import { toast } from "sonner";
 
 export interface ProductCardProps {
   product: ProductWithDetails;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  const dispatch = useDispatch();
   const router = useRouter();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    dispatch(addItem(product));
+    toast.success("Added to cart");
+  };
+
   return (
     <Card className="w-[300px] group relative overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-shadow duration-300">
       <figure className="relative">
@@ -51,7 +62,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex flex-col items-end space-y-1">
             <p className="text-xs text-gray-500">
               Expires:{" "}
-              {new Date(product.expiryDate).toLocaleDateString("en-US")}
+              {product.expiryDate
+                ? new Date(product.expiryDate).toLocaleDateString("en-US")
+                : "N/A"}
             </p>
             <div className="flex space-x-1 items-baseline">
               <span className="text-sm line-through text-red-500">
@@ -65,15 +78,24 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
       </CardContent>
       <CardFooter className="p-4 border-t border-gray-200">
-        <Button
-          variant="default"
-          className="w-full flex items-center justify-center"
-          onClick={() =>
-            router.push(`/products/${encodeURIComponent(product.id)}`)
-          }
-        >
-          <PlusIcon className="w-4 h-4 mr-2" /> Buy
-        </Button>
+        <div className="grid grid-cols-2 gap-2 w-full">
+          <Button
+            variant="outline"
+            className="flex items-center justify-center"
+            onClick={handleAddToCart}
+          >
+            <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
+          </Button>
+          <Button
+            variant="default"
+            className="flex items-center justify-center"
+            onClick={() =>
+              router.push(`/products/${encodeURIComponent(product.id)}`)
+            }
+          >
+            Details
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

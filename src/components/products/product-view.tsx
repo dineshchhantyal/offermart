@@ -9,8 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { ImageCarousel } from "@/components/ui/image-carousel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from "@/lib/utils";
-import { Clock, MapPin, Package, Tag, Truck } from "lucide-react";
+import { Clock, MapPin, Package, ShoppingCart, Tag, Truck } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { addItem } from "@/redux/features/cartSlice";
+import { toast } from "sonner";
 
 interface ProductViewProps {
   product: ProductWithDetails;
@@ -18,6 +21,30 @@ interface ProductViewProps {
 
 export function ProductView({ product }: ProductViewProps) {
   const router = useRouter();
+  const dispatch = useDispatch();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    // Create a new object with serialized dates
+    const serializedProduct: ProductWithDetails = {
+      ...product,
+      seller: {
+        id: product.seller.id,
+        name: product.seller.name,
+        image: product.seller.image,
+      },
+      category: {
+        id: product.category.id,
+        name: product.category.name,
+      },
+      images: product.images,
+    };
+
+    dispatch(addItem(serializedProduct));
+    toast.success("Added to cart");
+  };
+
   return (
     <div className="container mx-auto py-6">
       {/* Breadcrumb */}
@@ -97,7 +124,11 @@ export function ProductView({ product }: ProductViewProps) {
             <InfoCard
               icon={<Clock className="h-4 w-4" />}
               label="Expires"
-              value={format(new Date(product.expiryDate), "MMM d, yyyy")}
+              value={
+                product.expiryDate
+                  ? format(new Date(product.expiryDate), "MMM d, yyyy")
+                  : "Not specified"
+              }
             />
             <InfoCard
               icon={<Truck className="h-4 w-4" />}
@@ -148,8 +179,8 @@ export function ProductView({ product }: ProductViewProps) {
           {/* Actions */}
           <div className="flex gap-4">
             {!product.isDonation && (
-              <Button size="lg" className="flex-1">
-                Buy
+              <Button size="lg" className="flex-1" onClick={handleAddToCart}>
+                <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
               </Button>
             )}
             <Button

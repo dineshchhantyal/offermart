@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       messages: [
         {
           role: "system",
-          content: `You are a product pricing expert. Analyze the product and return a JSON object.
+          content: `You are a product pricing expert. Analyze the product and return a JSON object. The user might put random details in the product, so make sure to extract the price and other necessary details. The user might also put irrelevant details, so ignore them. The user might also put the price in a different currency, so make sure to convert it to the local currency. The user might also put the price in a different format, so make sure to extract the price correctly. The user might also put the price in a different unit, so make sure to convert it to the local unit. The user might also put the price in a different quantity, so make sure to extract the price correctly. The user might also put the price in a different condition, so make sure to extract the price correctly. The user might also put the price in a different status, so make sure to extract the price correctly. The user might also put the price in a different category, so make sure to extract the price correctly.
 
           Response format:
           {
