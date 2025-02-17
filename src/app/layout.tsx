@@ -20,29 +20,29 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "RenewMart",
-    template: "%s | RenewMart",
+    default: "OfferMart",
+    template: "%s | OfferMart",
   },
   description: "Buy and sell sustainable products",
-  metadataBase: new URL("https://renewmart.vercel.app"), // Update with your production URL
+  metadataBase: new URL("https://offermart.vercel.app"), // Update with your production URL
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://renewmart.vercel.app",
-    siteName: "RenewMart",
+    url: "https://offermart.vercel.app",
+    siteName: "OfferMart",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "RenewMart",
+        alt: "OfferMart",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@renewmart",
-    creator: "@renewmart",
+    site: "@offerwmart",
+    creator: "@offerwmart",
   },
   viewport: {
     width: "device-width",
