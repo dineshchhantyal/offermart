@@ -20,49 +20,29 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "OfferMart - Save Money, Reduce Waste",
-    template: "%s | OfferMart",
+    default: "RenewMart",
+    template: "%s | RenewMart",
   },
-  description:
-    "A commission-based marketplace connecting businesses with consumers to reduce food waste and save money.",
-  keywords: [
-    "food waste",
-    "sustainability",
-    "marketplace",
-    "discounted products",
-    "eco-friendly shopping",
-    "near-expiry deals",
-    "sustainable business",
-    "Gen Z",
-    "green commerce",
-  ],
-  authors: [{ name: "OfferMart Team" }],
-  creator: "OfferMart",
-  publisher: "OfferMart",
+  description: "Buy and sell sustainable products",
+  metadataBase: new URL("https://renewmart.vercel.app"), // Update with your production URL
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://offermart.com",
-    siteName: "OfferMart",
-    title: "OfferMart - Save Money, Reduce Waste",
-    description:
-      "Join the movement to reduce waste and save money. Find great deals on near-expiry items.",
+    url: "https://renewmart.vercel.app",
+    siteName: "RenewMart",
     images: [
       {
-        url: "/og-image.jpg", // Add your OG image
+        url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "OfferMart - Sustainable Shopping Platform",
+        alt: "RenewMart",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "OfferMart - Save Money, Reduce Waste",
-    description:
-      "Join the movement to reduce waste and save money. Find great deals on near-expiry items.",
-    images: ["/twitter-image.jpg"], // Add your Twitter card image
-    creator: "@offermart",
+    site: "@renewmart",
+    creator: "@renewmart",
   },
   viewport: {
     width: "device-width",
