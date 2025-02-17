@@ -1,25 +1,26 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { selectCartItems } from "@/redux/features/cartSlice";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
-import { OrderSummary } from "@/components/checkout/OrderSummary";
-import { redirect } from "next/navigation";
+import { toast } from "sonner";
 
 export default function CheckoutPage() {
-  const { items } = useSelector((state: RootState) => state.cart);
+  const router = useRouter();
+  const cartItems = useSelector(selectCartItems);
 
-  if (items.length === 0) {
-    redirect("/");
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      router.replace("/cart");
+      toast.error("Your cart is empty");
+    }
+  }, []);
+
+  if (cartItems.length === 0) {
+    return null;
   }
 
-  return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <CheckoutForm />
-        <OrderSummary />
-      </div>
-    </div>
-  );
+  return <CheckoutForm />;
 }

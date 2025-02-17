@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { selectCartItems } from "@/redux/features/cartSlice";
+import { selectCartItems, clearCart } from "@/redux/features/cartSlice";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +20,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { clearCart } from "@/redux/features/cartSlice";
 import { toast } from "sonner";
 
 const checkoutSchema = z.object({
@@ -57,14 +56,16 @@ export function CheckoutForm() {
   });
 
   const onSubmit = async (data: CheckoutFormValues) => {
+    if (isSubmitting) return;
+
+    if (cartItems.length === 0) {
+      toast.error("Your cart is empty");
+      router.push("/cart");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-
-      // Check if cart is empty
-      if (cartItems.length === 0) {
-        toast.error("Your cart is empty");
-        return;
-      }
 
       const orderData = {
         ...data,
@@ -88,9 +89,9 @@ export function CheckoutForm() {
         throw new Error(responseData.error || "Failed to create order");
       }
 
-      toast.success("Order placed successfully");
       dispatch(clearCart());
-      router.push(`/orders/${responseData.orderId}`);
+      toast.success("Order placed successfully");
+      router.push(`/orders`);
     } catch (error) {
       console.error("Checkout error:", error);
       toast.error(
@@ -100,6 +101,10 @@ export function CheckoutForm() {
       setIsSubmitting(false);
     }
   };
+
+  if (cartItems.length === 0) {
+    return null;
+  }
 
   return (
     <Card>

@@ -69,8 +69,9 @@ export function OrderSummary() {
                       Qty: {item.quantity}
                     </p>
                     <p className="text-sm font-medium">
-                      ${formatPrice(item.discountedPrice * item.quantity)}
+                      {formatPrice(item.discountedPrice * item.quantity)}
                     </p>
+                    w
                   </div>
                 </div>
               ))}
@@ -86,14 +87,14 @@ export function OrderSummary() {
                 <span className="text-muted-foreground">
                   Subtotal ({seller.name})
                 </span>
-                <span>${formatPrice(total)}</span>
+                <span>{formatPrice(total)}</span>
               </div>
             )
           )}
           <Separator />
           <div className="flex justify-between font-medium">
             <span>Total Amount</span>
-            <span>${formatPrice(totalAmount)}</span>
+            <span>{formatPrice(totalAmount)}</span>
           </div>
         </div>
       </CardContent>
