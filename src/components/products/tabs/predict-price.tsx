@@ -50,8 +50,6 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
   const [hasCalculated, setHasCalculated] = useState(false);
   const isDonation = form.watch("isDonation");
   const originalPrice = form.watch("originalPrice");
-  const condition = form.watch("condition");
-  const description = form.watch("description");
 
   const getAIPriceRecommendation = async () => {
     try {
@@ -59,23 +57,12 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
       setAnalysis(null);
       setHasCalculated(false);
 
-      // Get required fields for AI calculation
-      const productData = {
-        originalPrice,
-        condition,
-        description,
-        title: form.getValues("title"),
-        category: form.getValues("category"),
-        manufacturerDate: form.getValues("manufacturerDate"),
-        expiryDate: form.getValues("expiryDate"),
-      };
-
       const response = await fetch("/api/predict-price", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(productData),
+        body: JSON.stringify(form.getValues()),
       });
 
       if (!response.ok) {
@@ -88,6 +75,7 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
       form.setValue("discountedPrice", data.sellerPrice); // 40-60% of original
       form.setValue("price", data.marketPrice); // 70% of original
       setAnalysis(data.analysis);
+
       setHasCalculated(true);
 
       toast.success("Price recommendation calculated!");
@@ -141,10 +129,10 @@ const PredictPriceTab = ({ form }: PredictPriceTabProps) => {
               {isCalculating ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Calculating Best Price...
+                  Getting Best Deal...
                 </>
               ) : (
-                "Calculate Best Price"
+                "Get Best Deal"
               )}
             </Button>
 

@@ -12,8 +12,8 @@ export const productSchema = z.object({
 
   // Pricing
   originalPrice: z.number().positive("Original price must be positive"),
-  price: z.number().positive("Price must be positive"),
-  discountedPrice: z.number().positive("Discounted price must be positive"),
+  price: z.number().min(0, "Price must be positive"),
+  discountedPrice: z.number().min(0, "Price must be positive").optional(),
   // Product Details
   quantity: z.number().int().min(1, "Quantity must be at least 1"),
   unit: z.string().min(1, "Please specify the unit"),

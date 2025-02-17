@@ -30,32 +30,6 @@ export function DeliveryTab({ form, className }: DeliveryTabProps) {
         <CardTitle>Delivery Information</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Pickup Address Section */}
-        <div className="space-y-4">
-          <FormField
-            control={form.control}
-            name="pickupAddress"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pickup Address</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Enter the complete pickup address"
-                    rows={3}
-                    className="resize-none"
-                  />
-                </FormControl>
-                <FormDescription>
-                  This address will be shared with buyers after purchase
-                  confirmation
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
         {/* Delivery Options Section */}
         <div className="space-y-4">
           <FormField
@@ -133,6 +107,33 @@ export function DeliveryTab({ form, className }: DeliveryTabProps) {
               />
             </div>
           )}
+        </div>
+
+        {/* Pickup Address Section */}
+        <div className="space-y-4">
+          <FormField
+            control={form.control}
+            name="pickupAddress"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Pickup Address</FormLabel>
+                <FormControl>
+                  <Textarea
+                    {...field}
+                    placeholder="Enter the complete pickup address"
+                    rows={3}
+                    className="resize-none"
+                    required={!isDeliveryAvailable}
+                  />
+                </FormControl>
+                <FormDescription>
+                  This address will be shared with buyers after purchase
+                  confirmation
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       </CardContent>
     </Card>

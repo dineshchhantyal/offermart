@@ -9,15 +9,7 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const {
-      originalPrice,
-      condition,
-      description,
-      title,
-      category,
-      manufacturerDate,
-      expiryDate,
-    } = body;
+    const { originalPrice } = body;
 
     const analysis = await openai.chat.completions.create({
       model: "deepseek-chat",
@@ -46,13 +38,8 @@ export async function POST(request: Request) {
         {
           role: "user",
           content: `Analyze and price this product:
-Title: ${title}
-Category: ${category}
-Condition: ${condition}
-Description: ${description}
-Original Price: $${originalPrice}
-Manufacturer Date: ${manufacturerDate}
-Expiry Date: ${expiryDate}`,
+          ${JSON.stringify(body, null, 2)}
+          `,
         },
       ],
     });

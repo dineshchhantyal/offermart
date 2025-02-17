@@ -51,6 +51,8 @@ export function ProductForm() {
     },
   });
 
+  const discountedPrice = form.watch("discountedPrice");
+
   const calculateCommission = (data: ProductFormData) => {
     if (data.isDonation) return 0;
 
@@ -357,7 +359,7 @@ export function ProductForm() {
             <Button
               type="button"
               onClick={handleNext}
-              disabled={isDraftSaving || isListing}
+              disabled={isDraftSaving || isListing || discountedPrice === 0}
               className="flex-1"
             >
               Next
