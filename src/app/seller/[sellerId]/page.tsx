@@ -23,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatsCard from "@/components/seller/stats-card";
 
 interface SellerPageProps {
-  params: { sellerId: string };
+  params: Promise<{ sellerId: string }>;
 }
 
 export default async function SellerPage({ params }: SellerPageProps) {
@@ -198,7 +198,7 @@ export default async function SellerPage({ params }: SellerPageProps) {
         </TabsContent>
 
         <TabsContent value="reviews">
-          <SellerReviews reviews={seller.reviews} />
+          <SellerReviews reviews={seller.reviews} sellerId={sellerId} />
         </TabsContent>
 
         <TabsContent value="stats">

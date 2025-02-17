@@ -1,7 +1,7 @@
 import { db } from "@/lib/db";
-import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 import * as z from "zod";
+import { currentUser } from "@/lib/auth";
 
 const reviewSchema = z.object({
   sellerId: z.string(),
@@ -11,8 +11,8 @@ const reviewSchema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const session = await auth();
-    if (!session?.user) {
+    const session = await currentUser();
+    if (!session?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     const existingReview = await db.review.findFirst({
       where: {
         sellerId: body.sellerId,
-        reviewerId: session.user.id,
+        reviewerId: session.id,
       },
     });
 
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     const review = await db.review.create({
       data: {
         sellerId: body.sellerId,
-        reviewerId: session.user.id,
+        reviewerId: session.id,
         rating: body.rating,
         comment: body.comment,
       },
