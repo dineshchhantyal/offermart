@@ -55,7 +55,7 @@ export default function AboutPage() {
           <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <p className="text-sm">
               &nbsp;I save 30-50% on groceries while helping reduce waste
-              .&nbsp;Win-win!"
+              .&nbsp;Win-win!&nbsp;
             </p>
             <p className="text-sm font-medium mt-2">- Regular Customer</p>
           </div>
