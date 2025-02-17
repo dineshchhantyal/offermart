@@ -1,4 +1,5 @@
 import { ProductFormSkeleton } from "@/components/skeletons/ProductFormSkeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function LoadingSellPage() {
   return (
