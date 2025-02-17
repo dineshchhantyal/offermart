@@ -8,22 +8,27 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
-interface BuyProductsClientProps {
-  products: ProductWithDetails[];
+interface Category {
+  id: string;
+  name: string;
 }
 
-const categories = ["All", "Electronics", "Fashion", "Home", "Toys"];
+interface BuyProductsClientProps {
+  products: ProductWithDetails[];
+  categories: Category[];
+}
 
 export default function BuyProductsClient({
   products,
+  categories,
 }: BuyProductsClientProps) {
-  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [categoryFilter, setCategoryFilter] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesCategory =
-        categoryFilter === "All" || product.category.name === categoryFilter;
+        categoryFilter === "all" || product.categoryId === categoryFilter;
       const matchesSearch = product.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
@@ -53,15 +58,15 @@ export default function BuyProductsClient({
       {/* Categories ScrollArea */}
       <ScrollArea className="w-full whitespace-nowrap">
         <div className="flex space-x-2 pb-2">
-          {categories.map((cat) => (
+          {categories.map((category) => (
             <Button
-              key={cat}
-              variant={categoryFilter === cat ? "default" : "outline"}
-              onClick={() => setCategoryFilter(cat)}
+              key={category.id}
+              variant={categoryFilter === category.id ? "default" : "outline"}
+              onClick={() => setCategoryFilter(category.id)}
               className="min-w-[80px]"
               size="sm"
             >
-              {cat}
+              {category.name}
             </Button>
           ))}
         </div>
