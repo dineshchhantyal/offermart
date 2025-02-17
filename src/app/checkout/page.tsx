@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { selectCartItems } from "@/redux/features/cartSlice";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
 import { toast } from "sonner";
+import { OrderSummary } from "@/components/checkout/OrderSummary";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -22,5 +23,10 @@ export default function CheckoutPage() {
     return null;
   }
 
-  return <CheckoutForm />;
+  return (
+    <section className="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+      <CheckoutForm />
+      <OrderSummary />
+    </section>
+  );
 }
