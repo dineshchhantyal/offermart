@@ -40,8 +40,7 @@ export function Cart() {
   }, {} as Record<string, typeof items>);
 
   const totalAmount = items.reduce(
-    (total, item) =>
-      total + (item.product.discountedPrice ?? 0) * item.quantity,
+    (total, item) => total + (item.discountedPrice ?? 0) * item.quantity,
     0
   );
 
@@ -63,7 +62,7 @@ export function Cart() {
                   href={`/seller/${sellerId}`}
                   className="font-semibold hover:underline mb-2 block"
                 >
-                  {sellerItems[0].product.seller.name}
+                  {sellerItems[0].seller.name}
                 </Link>
                 <div className="space-y-4">
                   {sellerItems.map((item) => (
@@ -72,16 +71,16 @@ export function Cart() {
                       className="flex gap-4 bg-white dark:bg-gray-900 p-3 rounded-md"
                     >
                       <Image
-                        src={item.product.images[0].url}
-                        alt={item.product.title}
+                        src={item.images[0].url}
+                        alt={item.title}
                         width={80}
                         height={80}
                         className="rounded-md object-cover"
                       />
                       <div className="flex-1">
-                        <h4 className="font-medium">{item.product.title}</h4>
+                        <h4 className="font-medium">{item.title}</h4>
                         <p className="text-sm text-muted-foreground">
-                          ${item.product.discountedPrice}
+                          ${item.discountedPrice}
                         </p>
                         <div className="flex items-center gap-2 mt-2">
                           <Button

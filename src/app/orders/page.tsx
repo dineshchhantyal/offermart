@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Package, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { Suspense } from "react";
+import { OrderSkeleton } from "@/components/skeletons/OrderSkeleton";
 
 const statusConfig = {
   PENDING: { color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -15,7 +17,7 @@ const statusConfig = {
   CANCELLED: { color: "bg-red-100 text-red-800", icon: XCircle },
 };
 
-export default async function OrdersPage() {
+async function OrdersList() {
   const user = await currentUser();
   if (!user) redirect("/auth/login");
 
@@ -36,9 +38,7 @@ export default async function OrdersPage() {
   });
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-
+    <div className="space-y-6">
       {orders.length === 0 ? (
         <div className="text-center py-12">
           <Package className="mx-auto h-12 w-12 text-gray-400" />
@@ -112,6 +112,29 @@ export default async function OrdersPage() {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+export default async function OrdersPage() {
+  const user = await currentUser();
+  if (!user) redirect("/auth/login");
+
+  return (
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-2xl font-bold mb-6">My Orders</h1>
+
+      <Suspense
+        fallback={
+          <div className="space-y-6">
+            <OrderSkeleton />
+            <OrderSkeleton />
+            <OrderSkeleton />
+          </div>
+        }
+      >
+        <OrdersList />
+      </Suspense>
     </div>
   );
 }
