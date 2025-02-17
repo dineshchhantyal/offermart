@@ -107,12 +107,12 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
             >
               <Link href={`/category/${category.id}`}>
                 <div className="relative h-48 rounded-lg overflow-hidden">
-                  <Image
+                  {/* <Image
                     src={details.image}
                     alt={category.name}
                     fill
                     className="object-cover transition group-hover:scale-105"
-                  />
+                  /> */}
                   <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <Icon className={`w-12 h-12 ${details.color} mb-2`} />
