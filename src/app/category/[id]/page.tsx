@@ -56,7 +56,7 @@ async function CategoryProducts({ categoryId }: { categoryId: string }) {
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const categoryId = (await params).id;
   return (
-    <div className="container py-8">
+    <div className="container mx-auto py-8">
       <Suspense fallback={<ProductGridSkeleton />}>
         <CategoryProducts categoryId={categoryId} />
       </Suspense>
