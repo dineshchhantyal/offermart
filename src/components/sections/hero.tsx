@@ -107,7 +107,7 @@ export function HeroSection() {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">
-              * These are our pre-launch projections. We're committed to
+              * These are our pre-launch projections. We&apos;re committed to
               transparency and will update with actual figures post-launch.
             </p>
           </motion.div>
