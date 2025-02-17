@@ -142,7 +142,7 @@ export function ProductForm() {
   const isLastTab = currentTabIndex === TABS.length - 1;
 
   const tabFields = {
-    basic: ["title", "description", "category", "images"] as const,
+    basic: ["title", "description", "images", "categoryId"],
     details: [
       "originalPrice",
       "price",
@@ -151,16 +151,16 @@ export function ProductForm() {
       "condition",
       "manufacturerDate",
       "expiryDate",
-    ] as const,
-    delivery: ["pickupAddress", "isDeliveryAvailable"] as const,
-    payment: ["paymentMethods"] as const,
-    price: ["price", "discountedPrice"] as const,
-  };
+    ],
+    delivery: ["pickupAddress", "isDeliveryAvailable"],
+    payment: ["paymentMethods"],
+    price: ["price", "discountedPrice"],
+  } as const;
 
   const handleTabChange = async (tab: TabType) => {
     // Validate current tab fields before switching
     const currentTabFields = tabFields[activeTab];
-    const isValid = await form.trigger(currentTabFields);
+    const isValid = await form.trigger([...currentTabFields]);
 
     if (!isValid) {
       toast.error("Please fill in all required fields in current tab");
