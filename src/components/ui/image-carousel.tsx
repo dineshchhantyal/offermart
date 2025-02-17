@@ -37,8 +37,12 @@ export function ImageCarousel({ images }: ImageCarouselProps) {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        {images.length > 1 && (
+          <>
+            <CarouselPrevious />
+            <CarouselNext />
+          </>
+        )}
       </Carousel>
     </Card>
   );

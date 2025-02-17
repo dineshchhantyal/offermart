@@ -46,9 +46,9 @@ export function ProductView({ product }: ProductViewProps) {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center space-x-2 text-sm text-muted-foreground">
+    <div className="container mx-auto px-4 py-4 sm:py-6">
+      {/* Breadcrumb - Hide on mobile */}
+      <nav className="hidden mb-6 sm:flex items-center space-x-2 text-sm text-muted-foreground">
         <span>Home</span>
         <span>/</span>
         <span>{product.category.name}</span>
@@ -56,9 +56,9 @@ export function ProductView({ product }: ProductViewProps) {
         <span className="text-foreground">{product.title}</span>
       </nav>
 
-      <div className="grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-y-4 lg:gap-x-8 lg:gap-y-6 lg:grid-cols-2">
         {/* Left Column - Images */}
-        <div className="sticky top-6">
+        <div className="lg:sticky lg:top-6">
           <ImageCarousel
             images={product.images.map((image) => ({
               id: image.id,
@@ -69,34 +69,33 @@ export function ProductView({ product }: ProductViewProps) {
         </div>
 
         {/* Right Column - Product Info */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Header */}
           <div>
-            <div className="flex items-center justify-between">
-              <Badge
-                variant={getStatusVariant(product.status)}
-                className="mb-2"
-              >
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <Badge variant={getStatusVariant(product.status)}>
                 {product.status}
               </Badge>
               {product.isDonation && (
                 <Badge variant="secondary">Donation</Badge>
               )}
             </div>
-            <h1 className="text-3xl font-bold">{product.title}</h1>
-            <p className="text-muted-foreground">{product.category.name}</p>
+            <h1 className="text-2xl sm:text-3xl font-bold">{product.title}</h1>
+            <p className="text-sm text-muted-foreground">
+              {product.category.name}
+            </p>
           </div>
 
           <Separator />
 
           {/* Pricing */}
           <div className="space-y-2">
-            <div className="flex items-baseline space-x-2">
-              <span className="text-4xl font-bold">
+            <div className="flex flex-wrap items-baseline gap-2">
+              <span className="text-3xl sm:text-4xl font-bold">
                 ${product.price.toFixed(2)}
               </span>
               {product.discountedPrice && (
-                <span className="text-lg text-muted-foreground line-through">
+                <span className="text-base sm:text-lg text-muted-foreground line-through">
                   ${product.originalPrice?.toFixed(2)}
                 </span>
               )}
@@ -110,7 +109,7 @@ export function ProductView({ product }: ProductViewProps) {
           </div>
 
           {/* Quick Info */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <InfoCard
               icon={<Tag className="h-4 w-4" />}
               label="Condition"
@@ -137,37 +136,46 @@ export function ProductView({ product }: ProductViewProps) {
             />
           </div>
 
-          {/* Description */}
+          {/* Description - Collapsible on mobile */}
           <Card>
-            <CardContent className="pt-6">
-              <p className="text-sm leading-relaxed">{product.description}</p>
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="prose prose-sm max-h-32 sm:max-h-none overflow-y-auto">
+                <p className="text-sm leading-relaxed">{product.description}</p>
+              </div>
             </CardContent>
           </Card>
 
           {/* Location */}
           <div className="flex items-center space-x-2 text-sm">
-            <MapPin className="h-4 w-4" />
-            <span>{product.pickupAddress}</span>
+            <MapPin className="h-4 w-4 flex-shrink-0" />
+            <span className="truncate">{product.pickupAddress}</span>
           </div>
 
           {/* Seller Info */}
           <Card>
-            <CardContent className="flex items-center justify-between pt-6">
-              <div className="flex items-center space-x-4">
-                <Avatar className="h-12 w-12">
+            <CardContent className="flex items-center justify-between p-4 sm:pt-6">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                   <AvatarImage src={product.seller.image || undefined} />
                   <AvatarFallback>
                     {getInitials(product.seller.name || "")}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{product.seller.name}</p>
-                  <p className="text-sm text-muted-foreground">Seller</p>
+                  <p className="font-medium line-clamp-1">
+                    {product.seller.name}
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Seller
+                  </p>
                 </div>
               </div>
 
               {product.sellerId && (
                 <Button
+                  size="sm"
+                  variant="outline"
+                  className="hidden sm:inline-flex"
                   onClick={() => router.push(`/seller/${product?.sellerId}`)}
                 >
                   View Profile
@@ -176,27 +184,29 @@ export function ProductView({ product }: ProductViewProps) {
             </CardContent>
           </Card>
 
-          {/* Actions */}
-          <div className="flex gap-4">
-            {!product.isDonation && (
-              <Button size="lg" className="flex-1" onClick={handleAddToCart}>
-                <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
+          {/* Actions - Fixed to bottom on mobile */}
+          <div className="fixed bottom-0 left-0 right-0 p-4 bg-background border-t lg:relative lg:p-0 lg:border-0">
+            <div className="flex gap-3 max-w-lg mx-auto lg:max-w-none">
+              {!product.isDonation && (
+                <Button size="lg" className="flex-1" onClick={handleAddToCart}>
+                  <ShoppingCart className="w-4 h-4 mr-2" /> Add to Cart
+                </Button>
+              )}
+              <Button
+                size="lg"
+                variant="secondary"
+                className="flex-1"
+                onClick={() => router.push(`/seller/${product?.sellerId}`)}
+              >
+                Contact Seller
               </Button>
-            )}
-            <Button
-              size="lg"
-              variant="secondary"
-              className="flex-1"
-              onClick={() => router.push(`/seller/${product?.sellerId}`)}
-            >
-              Contact Seller
-            </Button>
+            </div>
           </div>
 
-          {/* Additional Details */}
-          <div className="space-y-4 text-sm">
+          {/* Additional Details - Accordion on mobile */}
+          <div className="space-y-4 text-sm pb-20 lg:pb-0">
             <Separator />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="font-medium">Payment Methods</p>
                 <p className="text-muted-foreground">
