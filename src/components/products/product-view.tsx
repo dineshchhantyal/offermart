@@ -76,7 +76,8 @@ export function ProductView({ product }: ProductViewProps) {
             </div>
             {product.discountedPrice && (
               <Badge variant="secondary">
-                Save ${((product.originalPrice ?? 0) - product.price).toFixed(2)}
+                Save $
+                {((product.originalPrice ?? 0) - product.price).toFixed(2)}
               </Badge>
             )}
           </div>
@@ -135,23 +136,30 @@ export function ProductView({ product }: ProductViewProps) {
               </div>
 
               {product.sellerId && (
-              <Button
-              onClick={() => router.push(`/seller/${product?.sellerId}`)}
-              >View Profile</Button>
+                <Button
+                  onClick={() => router.push(`/seller/${product?.sellerId}`)}
+                >
+                  View Profile
+                </Button>
               )}
             </CardContent>
           </Card>
 
           {/* Actions */}
           <div className="flex gap-4">
-            <Button size="lg" className="flex-1">
-              Contact Seller
-            </Button>
             {!product.isDonation && (
-              <Button size="lg" variant="secondary" className="flex-1">
-                Make Offer
+              <Button size="lg" className="flex-1">
+                Buy
               </Button>
             )}
+            <Button
+              size="lg"
+              variant="secondary"
+              className="flex-1"
+              onClick={() => router.push(`/seller/${product?.sellerId}`)}
+            >
+              Contact Seller
+            </Button>
           </div>
 
           {/* Additional Details */}
@@ -161,7 +169,13 @@ export function ProductView({ product }: ProductViewProps) {
               <div>
                 <p className="font-medium">Payment Methods</p>
                 <p className="text-muted-foreground">
-                  {product?.paymentMethods?.join(", ")}
+                  {product?.paymentMethods
+                    ?.map(
+                      (method) =>
+                        method.charAt(0).toUpperCase() +
+                        method.slice(1).toLowerCase().replace("_", " ")
+                    )
+                    .join(", ")}
                 </p>
               </div>
               <div>
@@ -179,7 +193,9 @@ export function ProductView({ product }: ProductViewProps) {
               <div>
                 <p className="font-medium">Manufactured</p>
                 <p className="text-muted-foreground">
-                  {product.manufacturerDate ? format(new Date(product.manufacturerDate), "MMM d, yyyy") : "Not specified"}
+                  {product.manufacturerDate
+                    ? format(new Date(product.manufacturerDate), "MMM d, yyyy")
+                    : "Not specified"}
                 </p>
               </div>
             </div>

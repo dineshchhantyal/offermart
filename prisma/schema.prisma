@@ -58,10 +58,18 @@ model User {
   isTwoFactorEnabled    Boolean                @default(false)
   twoFactorConfirmation TwoFactorConfirmation?
   sellerProducts        Product[]              @relation("SellerProducts")
-
-  @@map("users")
+  // Add new relations
+  reviews              Review[]               @relation("ReceivedReviews")
+  givenReviews         Review[]               @relation("GivenReviews")
+  sales                Sale[]                 @relation("SellerSales")
+  purchases            Sale[]                 @relation("BuyerPurchases")
+  location             String?
+  bio                  String?                @db.Text
+  contactEmail         String?
+  phoneNumber          String?
 
   createdAt DateTime @default(now())
+  @@map("users")
 }
 
 model VerificationToken {
@@ -142,6 +150,7 @@ model Product {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   images         Image[]
+  sales          Sale[]
 
   @@index([sellerId])
 }
@@ -179,4 +188,45 @@ enum ProductStatus {
   PENDING
   VERIFIED
   REJECTED
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  rating      Int      @default(0)
+  comment     String   @db.Text
+  seller      User     @relation("ReceivedReviews", fields: [sellerId], references: [id])
+  sellerId    String
+  reviewer    User     @relation("GivenReviews", fields: [reviewerId], references: [id])
+  reviewerId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([sellerId])
+  @@index([reviewerId])
+  @@map("reviews")
+}
+
+model Sale {
+  id          String        @id @default(cuid())
+  product     Product       @relation(fields: [productId], references: [id])
+  productId   String
+  seller      User          @relation("SellerSales", fields: [sellerId], references: [id])
+  sellerId    String
+  buyer       User          @relation("BuyerPurchases", fields: [buyerId], references: [id])
+  buyerId     String
+  amount      Float
+  status      SaleStatus    @default(PENDING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([sellerId])
+  @@index([buyerId])
+  @@index([productId])
+  @@map("sales")
+}
+
+enum SaleStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
 }
