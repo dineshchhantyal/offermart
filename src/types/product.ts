@@ -10,6 +10,10 @@ export const productSchema = z.object({
   category: z.string().min(1, "Please select a category"),
   images: z.array(z.string().url()).min(1, "At least one image is required"),
 
+  categoryId: z.string({
+    required_error: "Please select a category",
+  }),
+
   // Pricing
   originalPrice: z.number().positive("Original price must be positive"),
   price: z.number().min(0, "Price must be positive"),
