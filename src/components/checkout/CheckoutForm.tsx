@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { selectCartItems } from "@/redux/features/cartSlice";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { clearCart } from "@/redux/features/cartSlice";
+import { toast } from "sonner";
 
 const checkoutSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -36,6 +39,8 @@ type CheckoutFormValues = z.infer<typeof checkoutSchema>;
 export function CheckoutForm() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const cartItems = useSelector(selectCartItems);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutSchema),
@@ -51,21 +56,50 @@ export function CheckoutForm() {
     },
   });
 
-  async function onSubmit(data: CheckoutFormValues) {
+  const onSubmit = async (data: CheckoutFormValues) => {
     try {
-      // Here you would typically make an API call to create the order
-      await fetch("/api/orders", {
+      setIsSubmitting(true);
+
+      // Check if cart is empty
+      if (cartItems.length === 0) {
+        toast.error("Your cart is empty");
+        return;
+      }
+
+      const orderData = {
+        ...data,
+        items: cartItems.map((item) => ({
+          productId: item.id,
+          sellerId: item.sellerId,
+          quantity: item.quantity,
+          price: item.discountedPrice,
+        })),
+      };
+
+      const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(orderData),
       });
 
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(responseData.error || "Failed to create order");
+      }
+
+      toast.success("Order placed successfully");
       dispatch(clearCart());
-      router.push("/orders/success");
+      router.push(`/orders/${responseData.orderId}`);
     } catch (error) {
       console.error("Checkout error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create order"
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -191,8 +225,15 @@ export function CheckoutForm() {
               )}
             />
 
-            <Button type="submit" className="w-full">
-              Place Order
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Processing...
+                </div>
+              ) : (
+                "Place Order"
+              )}
             </Button>
           </form>
         </Form>

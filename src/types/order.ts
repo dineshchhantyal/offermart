@@ -2,19 +2,20 @@ import { OrderStatus } from "@prisma/client";
 
 export interface OrderItem {
   productId: string;
+  sellerId: string;
   quantity: number;
   price: number;
-  sellerId: string;
 }
 
 export interface CreateOrderRequest {
   items: OrderItem[];
+  fullName: string;
+  email: string;
+  phone: string;
   address: string;
   city: string;
   state: string;
   zipCode: string;
-  phone: string;
-  email: string;
   deliveryInstructions?: string;
 }
 

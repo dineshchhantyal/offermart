@@ -12,16 +12,16 @@ export function OrderSummary() {
 
   const itemsBySeller = items.reduce(
     (acc, item) => {
-      const sellerId = item.product.sellerId;
+      const sellerId = item.sellerId;
       if (!acc[sellerId]) {
         acc[sellerId] = {
-          seller: item.product.seller,
+          seller: item.seller,
           items: [],
           total: 0,
         };
       }
       acc[sellerId].items.push(item);
-      acc[sellerId].total += item.product.discountedPrice * item.quantity;
+      acc[sellerId].total += item.discountedPrice * item.quantity;
       return acc;
     },
     {} as Record<
@@ -57,24 +57,19 @@ export function OrderSummary() {
                 <div key={item.id} className="flex gap-4">
                   <div className="relative h-16 w-16 rounded overflow-hidden flex-shrink-0">
                     <Image
-                      src={item.product.images[0].url}
-                      alt={item.product.title}
+                      src={item.images[0].url}
+                      alt={item.title}
                       fill
                       className="object-cover"
                     />
                   </div>
                   <div className="flex-1">
-                    <h4 className="text-sm font-medium">
-                      {item.product.title}
-                    </h4>
+                    <h4 className="text-sm font-medium">{item.title}</h4>
                     <p className="text-sm text-muted-foreground">
                       Qty: {item.quantity}
                     </p>
                     <p className="text-sm font-medium">
-                      $
-                      {formatPrice(
-                        item.product.discountedPrice * item.quantity
-                      )}
+                      ${formatPrice(item.discountedPrice * item.quantity)}
                     </p>
                   </div>
                 </div>

@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { UserButton } from "../auth/user-button";
 import { CartButton } from "../cart/CartButton";
 import { CartView } from "@/components/cart/CartView";
+import { Package } from "lucide-react";
 
 interface HeaderProps {
   label: string;
@@ -27,9 +28,10 @@ export const Header = async ({ label }: HeaderProps) => {
             {user && (
               <>
                 <CartButton />
-                <Link href="/sell">
-                  <Button variant="outline" className="text-primary">
-                    Sell
+                <Link href="/orders">
+                  <Button variant="ghost" size="icon">
+                    <Package className="h-5 w-5" />
+                    <span className="sr-only">Orders</span>
                   </Button>
                 </Link>
                 <UserButton />

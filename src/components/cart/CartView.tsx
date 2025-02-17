@@ -33,16 +33,16 @@ export function CartView() {
   // Group items by seller
   const itemsBySeller = items.reduce(
     (acc, item) => {
-      const sellerId = item.product.sellerId;
+      const sellerId = item.sellerId;
       if (!acc[sellerId]) {
         acc[sellerId] = {
-          seller: item.product.seller,
+          seller: item.seller,
           items: [],
           total: 0,
         };
       }
       acc[sellerId].items.push(item);
-      acc[sellerId].total += item.product.discountedPrice * item.quantity;
+      acc[sellerId].total += item.discountedPrice * item.quantity;
       return acc;
     },
     {} as Record<
@@ -130,8 +130,8 @@ export function CartView() {
                       >
                         <div className="relative h-20 w-20 rounded-md overflow-hidden">
                           <Image
-                            src={item.product.images[0].url}
-                            alt={item.product.title}
+                            src={item.images[0].url}
+                            alt={item.title}
                             fill
                             className="object-cover"
                           />
@@ -142,13 +142,11 @@ export function CartView() {
                             className="font-medium hover:underline"
                             onClick={() => dispatch(toggleCart())}
                           >
-                            {item.product.title}
+                            {item.title}
                           </Link>
                           <div className="flex items-center space-x-2">
-                            <Badge variant="secondary">
-                              {item.product.condition}
-                            </Badge>
-                            {item.product.isDonation && (
+                            <Badge variant="secondary">{item.condition}</Badge>
+                            {item.isDonation && (
                               <Badge variant="default">Donation</Badge>
                             )}
                           </div>
@@ -183,20 +181,18 @@ export function CartView() {
                                     })
                                   )
                                 }
-                                disabled={
-                                  item.quantity >= item.product.quantity
-                                }
+                                disabled={item.quantity >= item.quantity}
                               >
                                 <Plus className="h-4 w-4" />
                               </Button>
                             </div>
                             <div className="space-y-1 text-right">
                               <div className="text-sm font-medium">
-                                {formatPrice(item.product.discountedPrice)}
+                                {formatPrice(item.discountedPrice)}
                               </div>
-                              {item.product.originalPrice && (
+                              {item.originalPrice && (
                                 <div className="text-xs line-through text-muted-foreground">
-                                  {formatPrice(item.product.originalPrice)}
+                                  {formatPrice(item.originalPrice)}
                                 </div>
                               )}
                             </div>

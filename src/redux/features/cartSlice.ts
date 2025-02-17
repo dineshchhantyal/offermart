@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
 import { ProductWithDetails } from "@/types/product";
 
-interface CartItem {
-  id: string;
-  product: ProductWithDetails;
+interface CartItem extends ProductWithDetails {
   quantity: number;
-  sellerId: string;
 }
 
 interface CartState {
@@ -31,10 +29,8 @@ export const cartSlice = createSlice({
         existingItem.quantity++;
       } else {
         state.items.push({
-          id: action.payload.id,
-          product: action.payload,
+          ...action.payload,
           quantity: 1,
-          sellerId: action.payload.sellerId,
         });
       }
     },
@@ -59,6 +55,19 @@ export const cartSlice = createSlice({
   },
 });
 
+// Export actions
 export const { addItem, removeItem, updateQuantity, clearCart, toggleCart } =
   cartSlice.actions;
+
+// Export selectors
+export const selectCartItems = (state: RootState) => state.cart.items;
+export const selectCartTotal = (state: RootState) =>
+  state.cart.items.reduce(
+    (total, item) => total + item.discountedPrice * item.quantity,
+    0
+  );
+export const selectCartItemsCount = (state: RootState) =>
+  state.cart.items.length;
+
+// Export reducer
 export default cartSlice.reducer;
