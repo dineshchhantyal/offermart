@@ -1,12 +1,10 @@
 import { Suspense } from "react";
 import { CountdownTimer } from "@/components/CountdownTimer";
 import BuyProductsClient from "./BuyProductsClient";
-import FlashSales from "./FlashSales";
 import Loading from "./loading";
 import { notFound } from "next/navigation";
 import { FeaturedProducts } from "@/components/featured/FeaturedProducts";
 import { CategoryShowcase } from "@/components/categories/CategoryShowcase";
-import { SearchFilters } from "@/components/filters/SearchFilters";
 
 async function fetchData() {
   try {
