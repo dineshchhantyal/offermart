@@ -63,9 +63,9 @@ export function MissionSection() {
                 viewport={{ once: true }}
                 transition={{ delay: 0.2 }}
               >
-                As Gen Z innovators, we're tackling the $1 trillion food waste
-                problem by creating a sustainable marketplace that benefits both
-                businesses and consumers.
+                As Gen Z innovators, we&apos;re tackling the $1 trillion food
+                waste problem by creating a sustainable marketplace that
+                benefits both businesses and consumers.
               </motion.p>
             </div>
 
