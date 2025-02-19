@@ -13,7 +13,9 @@ async function fetchProducts() {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/products/new`,
       {
-        cache: "no-cache",
+        next: {
+          revalidate: 7200, // Revalidates every 2 hours (7200 seconds)
+        },
       }
     );
 
