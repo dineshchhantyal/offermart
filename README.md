@@ -1,10 +1,10 @@
-# RenewMart
+# OfferMart
 
 A community-driven marketplace platform focused on reducing waste by connecting sellers of near-expiry goods with conscious buyers. Built with Next.js 14, the platform serves both B2B businesses and individual users.
 
 ## Overview
 
-RenewMart empowers businesses and individuals to extend the life of near-expiry products through sales or donations. Our AI-powered platform ensures quality verification while promoting sustainable commerce and community impact.
+OfferMart empowers businesses and individuals to extend the life of near-expiry products through sales or donations. Our AI-powered platform ensures quality verification while promoting sustainable commerce and community impact.
 
 ### Key Goals
 
@@ -134,7 +134,7 @@ npm run dev
 
 ```
 
-renew-mart/
+offer-mart/
 ├── src/
 │ ├── app/ # Next.js 14 app router
 │ ├── components/ # Reusable components
